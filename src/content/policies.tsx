@@ -157,7 +157,7 @@ export const policies: PolicyDoc[] = [
     summary: 'What our warranty covers and how to claim.',
     body: () => (
       <>
-        <p>Every item we sell comes with a warranty. The warranty period is shown on each product page and on your invoice.</p>
+        <p>Warranty applies to selected items. Where a product has a warranty, its period is shown on the product page and on your invoice.</p>
         <h2>What is covered</h2>
         <ul>
           <li>Manufacturing defects and hardware faults that occur during normal use within the warranty period.</li>

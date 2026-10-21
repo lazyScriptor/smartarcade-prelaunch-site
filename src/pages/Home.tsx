@@ -7,7 +7,7 @@ import ProductArt, { artIcons } from '../components/ProductArt'
 
 const perks = [
   { icon: BadgeCheck, title: '100% genuine', text: 'Sealed, original products from trusted sources.' },
-  { icon: ShieldCheck, title: 'Warranty on everything', text: 'Every unit recorded by serial number.' },
+  { icon: ShieldCheck, title: 'Warranty on selected items', text: 'Warranty period shown on each product.' },
   { icon: Truck, title: 'Island-wide delivery', text: `From ${formatLKR(shop.delivery.rates.baseFee)} (by weight), or free store pickup in ${shop.city}.` },
   { icon: Wallet, title: 'Pay your way', text: `Pay by ${payWays()}.` },
 ]

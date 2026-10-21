@@ -13,7 +13,7 @@ export default function Footer() {
         <div>
           <Logo />
           <p className="mt-4 text-sm leading-relaxed text-white/70">
-            Gaming consoles, accessories and smart gadgets from {shop.city}. Genuine products, honest prices and warranty on every item.
+            Gaming consoles, accessories and smart gadgets from {shop.city}. Genuine products, honest prices and warranty on selected items.
           </p>
           <div className="mt-5"><PaymentBadges dark /></div>
         </div>

@@ -23,7 +23,7 @@ export default function Header() {
       <div className="bg-lime text-navy">
         <div className="container-x flex h-9 items-center justify-center gap-6 overflow-hidden text-xs font-semibold md:justify-between">
           <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> <span>Island-wide delivery from {formatLKR(shop.delivery.rates.baseFee)}<span className="hidden sm:inline"> · free store pickup in {shop.city}</span></span></span>
-          <span className="hidden items-center gap-1.5 md:flex"><ShieldCheck className="h-3.5 w-3.5" /> Warranty on every item</span>
+          <span className="hidden items-center gap-1.5 md:flex"><ShieldCheck className="h-3.5 w-3.5" /> Warranty on selected items</span>
           <span className="hidden items-center gap-1.5 lg:flex"><CreditCard className="h-3.5 w-3.5" /> Pay by {payWays()}</span>
           <a href={`tel:${shop.phoneHref}`} className="hidden items-center gap-1.5 lg:flex"><Phone className="h-3.5 w-3.5" /> {shop.phone}</a>
         </div>
