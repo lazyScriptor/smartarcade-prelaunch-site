@@ -1,14 +1,14 @@
 import { ChevronDown } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { formatLKR, shop } from '../config/shop'
+import { cardGateway, formatLKR, payWays, shop } from '../config/shop'
 import PageHeader from '../components/PageHeader'
 
 const faqs: [string, string][] = [
   ['Are your products genuine?', 'Yes. We sell only original products. Pre-owned items are clearly labelled, tested and come with a shop warranty.'],
-  ['How do I pay?', `You can pay by Visa, Mastercard or Amex through PayHere (up to ${formatLKR(shop.payments.payhere.maxPerPayment)} per order), by bank transfer, or cash on delivery.`],
-  ['Is it safe to pay by card on your website?', 'Yes. Card payments are processed by PayHere, a Central Bank-approved payment gateway in Sri Lanka. Your card details are entered on PayHere’s secure page and never reach us.'],
-  ['How much is delivery and how long does it take?', `Island-wide delivery costs ${formatLKR(shop.delivery.flatFee)} and is free above ${formatLKR(shop.delivery.freeAbove)}. Most orders arrive in ${shop.delivery.days}. Store pickup in ${shop.city} is free.`],
-  ['Can I return an item?', `Unopened items can be returned within ${shop.returns.changeOfMindDays} days. Damaged or faulty items are replaced or refunded — see our Returns & Refunds Policy.`],
+  ['How do I pay?', `You can pay by Visa, Mastercard or Amex through ${cardGateway.name}${cardGateway.maxPerPayment !== null ? ` (up to ${formatLKR(cardGateway.maxPerPayment)} per order)` : ''}, or by ${payWays({ card: false })}.${shop.payments.payAtStore.enabled ? ' For store pickup you can also pay when you collect.' : ''}`],
+  ['Is it safe to pay by card on your website?', `Yes. Card payments are processed by ${cardGateway.name}, a secure payment gateway in Sri Lanka. Your card details are entered on ${cardGateway.name}’s secure page and never reach us.`],
+  ['How much is delivery and how long does it take?', `Island-wide delivery by ${shop.delivery.courier} is charged by weight: ${formatLKR(shop.delivery.rates.baseFee)} for up to ${shop.delivery.rates.baseKg} kg, plus ${formatLKR(shop.delivery.rates.perExtraKg)} for each extra kg or part of a kg. You see the exact charge at checkout. Most orders arrive in ${shop.delivery.days}. Store pickup in ${shop.city} is free, and we offer free-delivery promo codes from time to time.`],
+  ['Can I return or exchange an item?', `We don’t accept change-of-mind returns or exchanges at the moment. If an item arrives damaged, faulty or not as ordered, tell us within ${shop.returns.reportProblemHours} hours with photos or a short video — after inspection we’ll repair, replace or refund it. See our Returns & Refunds Policy.`],
   ['How does the warranty work?', 'Every unit is recorded by serial number. Contact us with your order number and we’ll repair or replace it under warranty.'],
   ['Can I reserve a product or ask about stock?', 'Yes — message us on WhatsApp with the product name and we’ll confirm stock right away.'],
 ]

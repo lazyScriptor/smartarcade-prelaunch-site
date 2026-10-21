@@ -1,15 +1,15 @@
-import { ArrowRight, BadgeCheck, Headphones as Support, MapPin, RefreshCw, ShieldCheck, Truck, Wallet } from 'lucide-react'
+import { ArrowRight, BadgeCheck, CircleHelp, Headphones as Support, MapPin, ShieldCheck, Truck, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { categories, products } from '../data/products'
-import { formatLKR, shop, waLink } from '../config/shop'
+import { formatLKR, payWays, shop, waLink } from '../config/shop'
 import ProductCard from '../components/ProductCard'
 import ProductArt, { artIcons } from '../components/ProductArt'
 
 const perks = [
   { icon: BadgeCheck, title: '100% genuine', text: 'Sealed, original products from trusted sources.' },
   { icon: ShieldCheck, title: 'Warranty on everything', text: 'Every unit recorded by serial number.' },
-  { icon: Truck, title: 'Island-wide delivery', text: `Free above ${formatLKR(shop.delivery.freeAbove)}, or pick up in ${shop.city}.` },
-  { icon: Wallet, title: 'Pay your way', text: 'Card via PayHere, bank transfer or cash on delivery.' },
+  { icon: Truck, title: 'Island-wide delivery', text: `From ${formatLKR(shop.delivery.rates.baseFee)} (by weight), or free store pickup in ${shop.city}.` },
+  { icon: Wallet, title: 'Pay your way', text: `Pay by ${payWays()}.` },
 ]
 
 export default function Home() {
@@ -174,7 +174,7 @@ export default function Home() {
             <p className="mt-2 text-slate-600">Message us on WhatsApp — we’ll help you pick the right console, games setup or accessories for your budget.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a href={waLink(`Hi ${shop.name}, I need some help choosing a product.`)} target="_blank" rel="noreferrer" className="btn btn-wa">Chat on WhatsApp</a>
-              <Link to="/policies/refunds" className="btn btn-ghost"><RefreshCw className="h-4 w-4" /> Easy returns</Link>
+              <Link to="/faq" className="btn btn-ghost"><CircleHelp className="h-4 w-4" /> Read our FAQ</Link>
             </div>
           </div>
         </div>

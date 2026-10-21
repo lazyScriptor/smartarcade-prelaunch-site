@@ -1,9 +1,9 @@
 import { Banknote, CreditCard, Landmark, Lock, MessageCircle, Store, Truck } from 'lucide-react'
 import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { formatLKR, shop } from '../config/shop'
+import { cardGateway, formatLKR, shop } from '../config/shop'
 import { useCart } from '../store/cart'
-import { deliveryFee, type DeliveryMethod } from '../lib/totals'
+import { cartWeightKg, deliveryFee, formatKg, type DeliveryMethod } from '../lib/totals'
 import { districts, newOrderRef, normaliseMobile, saveOrder, type PaymentMethod } from '../lib/orders'
 import PageHeader from '../components/PageHeader'
 import ProductArt from '../components/ProductArt'
@@ -21,28 +21,32 @@ export default function Checkout() {
   if (placed.current) return <Navigate to={`/order/${placed.current}`} replace />
   if (rows.length === 0) return <Navigate to="/cart" replace />
 
-  const fee = deliveryFee(subtotal, delivery)
+  const weight = cartWeightKg(rows)
+  const courierFee = deliveryFee(rows, 'delivery')
+  const fee = deliveryFee(rows, delivery)
   const total = subtotal + fee
-  const { payhere, bankTransfer, cod, whatsapp } = shop.payments
-  const overCardCap = total > payhere.maxPerPayment
+  const { card, bankTransfer, cod, payAtStore, whatsapp } = shop.payments
+  const cardCap = cardGateway.maxPerPayment
+  const overCardCap = cardCap !== null && total > cardCap
   const overCod = total > cod.max
 
-  const methods: { id: PaymentMethod; icon: ReactNode; title: string; text: string; disabled?: string; show: boolean }[] = [
+  const allMethods: { id: PaymentMethod; icon: ReactNode; title: string; text: string; disabled?: string; show: boolean }[] = [
     {
-      id: 'payhere', icon: <CreditCard className="h-5 w-5" />, title: 'Credit / debit card (PayHere)',
-      text: 'Visa, Mastercard, Amex — secure payment page by PayHere.',
-      disabled: !payhere.enabled ? 'Activating soon' : overCardCap ? `Card payments up to ${formatLKR(payhere.maxPerPayment)} per order` : undefined,
+      id: 'card', icon: <CreditCard className="h-5 w-5" />, title: `Credit / debit card (${cardGateway.name})`,
+      text: `Visa, Mastercard, Amex — secure payment page by ${cardGateway.name}.`,
+      disabled: !card.enabled ? 'Activating soon' : overCardCap ? `Card payments up to ${formatLKR(cardCap)} per order` : undefined,
       show: true,
     },
     { id: 'bank', icon: <Landmark className="h-5 w-5" />, title: 'Bank transfer', text: 'Transfer to our account and send us the slip. Dispatched once funds arrive.', show: bankTransfer.enabled },
     {
-      id: 'cod', icon: <Banknote className="h-5 w-5" />, title: delivery === 'pickup' ? 'Pay at the store' : 'Cash on delivery',
-      text: delivery === 'pickup' ? 'Pay by cash or card when you collect.' : 'Pay the courier in cash when your parcel arrives.',
-      disabled: delivery === 'delivery' && overCod ? `COD available up to ${formatLKR(cod.max)}` : undefined,
-      show: cod.enabled,
+      id: 'cod', icon: <Banknote className="h-5 w-5" />, title: 'Cash on delivery', text: 'Pay the courier in cash when your parcel arrives.',
+      disabled: overCod ? `COD available up to ${formatLKR(cod.max)}` : undefined,
+      show: cod.enabled && delivery === 'delivery',
     },
+    { id: 'store', icon: <Store className="h-5 w-5" />, title: 'Pay at the store', text: 'Pay by cash or card when you collect.', show: payAtStore.enabled && delivery === 'pickup' },
     { id: 'whatsapp', icon: <MessageCircle className="h-5 w-5" />, title: 'Confirm on WhatsApp', text: 'Send us your order on WhatsApp and we’ll confirm payment and delivery with you.', show: whatsapp.enabled },
   ]
+  const methods = allMethods.filter(m => m.show)
 
   const clearError = (k: string) => setErrors(({ [k]: _, ...rest }) => rest)
   const upd = (k: keyof typeof form) => (e: { target: { value: string } }) => {
@@ -59,7 +63,7 @@ export default function Checkout() {
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) err.email = 'Please check your email address.'
     if (delivery === 'delivery' && form.address.trim().length < 5) err.address = 'Please enter your delivery address.'
     if (delivery === 'delivery' && !form.city.trim()) err.city = 'Please enter your city.'
-    const chosen = methods.find(m => m.id === payment)
+    const chosen = methods.find(m => m.id === payment) // only shown methods count, so switching delivery type can't keep a hidden one
     if (!chosen || chosen.disabled) err.payment = 'Please choose an available payment method.'
     if (!agree) err.agree = 'Please accept the terms to continue.'
     setErrors(err)
@@ -99,7 +103,7 @@ export default function Checkout() {
           <Card step={2} title="Delivery">
             <div className="grid gap-3 sm:grid-cols-2">
               <Choice checked={delivery === 'delivery'} onChange={() => setDelivery('delivery')} name="delivery" icon={<Truck className="h-5 w-5" />}
-                title="Island-wide delivery" text={subtotal >= shop.delivery.freeAbove ? 'Free' : `${formatLKR(shop.delivery.flatFee)} · free above ${formatLKR(shop.delivery.freeAbove)}`} />
+                title={`Island-wide delivery – ${shop.delivery.courier}`} text={`${formatLKR(courierFee)} for your ${formatKg(weight)} order · charged by weight`} />
               <Choice checked={delivery === 'pickup'} onChange={() => setDelivery('pickup')} name="delivery" icon={<Store className="h-5 w-5" />}
                 title={`Store pickup – ${shop.city}`} text="Free · we’ll message you when it’s ready" />
             </div>
@@ -117,12 +121,12 @@ export default function Checkout() {
 
           <Card step={3} title="Payment">
             <div id="f-payment" className="grid gap-3">
-              {methods.filter(m => m.show).map(m => (
+              {methods.map(m => (
                 <Choice key={m.id} name="payment" checked={payment === m.id} onChange={() => { setPayment(m.id); clearError('payment') }} icon={m.icon} title={m.title} text={m.text} disabled={m.disabled} />
               ))}
             </div>
             {errors.payment && <p className="mt-2 text-sm text-rose-600">{errors.payment}</p>}
-            <p className="mt-4 flex items-center gap-2 text-xs text-slate-500"><Lock className="h-3.5 w-3.5" /> Card details are entered only on PayHere’s secure page — we never see or store them.</p>
+            <p className="mt-4 flex items-center gap-2 text-xs text-slate-500"><Lock className="h-3.5 w-3.5" /> Card details are entered only on {cardGateway.name}’s secure page — we never see or store them.</p>
           </Card>
         </div>
 
@@ -146,7 +150,7 @@ export default function Checkout() {
             </ul>
             <dl className="mt-5 space-y-2.5 border-t border-slate-100 pt-4 text-sm">
               <div className="flex justify-between"><dt className="text-slate-600">Subtotal</dt><dd className="font-semibold">{formatLKR(subtotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-slate-600">{delivery === 'pickup' ? 'Store pickup' : 'Delivery'}</dt><dd className="font-semibold">{fee ? formatLKR(fee) : 'Free'}</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-600">{delivery === 'pickup' ? 'Store pickup' : `Delivery (${formatKg(weight)})`}</dt><dd className="font-semibold">{fee ? formatLKR(fee) : 'Free'}</dd></div>
               <div className="flex justify-between border-t border-slate-100 pt-3 text-base"><dt className="font-bold">Total</dt><dd className="font-display text-2xl font-extrabold text-navy">{formatLKR(total)}</dd></div>
             </dl>
             <label id="f-agree" className="mt-5 flex cursor-pointer gap-3 text-sm text-slate-600">

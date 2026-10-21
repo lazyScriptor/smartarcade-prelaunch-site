@@ -10,7 +10,7 @@ export default function Contact() {
     window.open(waLink(`Hi ${shop.name}, I'm ${f.name} (${f.phone}).\n${f.message}`), '_blank', 'noopener')
   }
   const cards = [
-    { icon: Phone, title: 'Call us', value: shop.phone, href: `tel:${shop.phoneHref}` },
+    { icon: Phone, title: 'Call us', value: shop.phone, href: `tel:${shop.phoneHref}`, sub: `or ${shop.phoneAlt}` },
     { icon: MessageCircle, title: 'WhatsApp', value: shop.phone, href: waLink(`Hi ${shop.name}!`) },
     { icon: Mail, title: 'Email', value: shop.email, href: `mailto:${shop.email}` },
     { icon: MapPin, title: 'Visit', value: shop.address, href: shop.mapsUrl },
@@ -22,11 +22,12 @@ export default function Contact() {
       </PageHeader>
       <section className="container-x py-10">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {cards.map(({ icon: Icon, title, value, href }) => (
+          {cards.map(({ icon: Icon, title, value, href, sub }) => (
             <a key={title} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noreferrer" className="group rounded-3xl border border-slate-200/80 bg-white p-6 transition hover:-translate-y-1 hover:shadow-lg">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-navy text-lime transition group-hover:bg-lime group-hover:text-navy"><Icon className="h-6 w-6" /></div>
               <p className="mt-4 text-sm text-slate-500">{title}</p>
               <p className="break-words font-semibold text-navy">{value}</p>
+              {sub && <p className="text-sm text-slate-500">{sub}</p>}
             </a>
           ))}
         </div>

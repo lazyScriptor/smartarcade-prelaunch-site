@@ -1,13 +1,14 @@
 // Policy templates drafted by tadXweb for the client's approval (not legal advice) — FR-CMS-11 / FR-CMS-12.
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { formatLKR, shop } from '../config/shop'
+import { cardGateway, formatLKR, payWays, shop } from '../config/shop'
+import { extraKg, feeForWeight } from '../lib/totals'
 
 export interface PolicyDoc { slug: string; title: string; summary: string; body: () => ReactNode }
 
 const Contact = () => (
   <ul>
-    <li>Phone / WhatsApp: <a href={`tel:${shop.phoneHref}`}>{shop.phone}</a></li>
+    <li>Phone / WhatsApp: <a href={`tel:${shop.phoneHref}`}>{shop.phone}</a> or <a href={`tel:${shop.phoneAltHref}`}>{shop.phoneAlt}</a></li>
     <li>Email: <a href={`mailto:${shop.email}`}>{shop.email}</a></li>
     <li>Shop: {shop.address}</li>
   </ul>
@@ -30,14 +31,16 @@ export const policies: PolicyDoc[] = [
         </ul>
         <h2>2. Orders</h2>
         <ul>
-          <li>An order is confirmed when we accept it and payment is received (or, for cash on delivery, when we confirm it by phone or WhatsApp).</li>
+          <li>An order is confirmed when we accept it and payment is received{shop.payments.cod.enabled && ' (or, for cash on delivery, when we confirm it by phone or WhatsApp)'}.</li>
           <li>We may refuse or cancel an order if stock is unavailable, the payment fails or is suspected to be fraudulent, or delivery details cannot be verified. Any amount paid will be refunded in full.</li>
         </ul>
         <h2>3. Payment</h2>
         <ul>
-          <li>We accept Visa, Mastercard and American Express cards through <b>PayHere</b>, bank transfer, and cash on delivery.</li>
-          <li>Card payments are processed securely by PayHere (PCI-DSS compliant). We never see or store your full card details.</li>
-          <li>A single card payment is limited to {formatLKR(shop.payments.payhere.maxPerPayment)}. Larger orders can be paid by bank transfer or cash on delivery.</li>
+          <li>We accept Visa, Mastercard and American Express cards through <b>{cardGateway.name}</b>, and {payWays({ card: false })}.</li>
+          <li>Card payments are processed securely by {cardGateway.name}. We never see or store your full card details.</li>
+          {cardGateway.maxPerPayment !== null && (
+            <li>A single card payment is limited to {formatLKR(cardGateway.maxPerPayment)}. Larger orders can be paid by {payWays({ card: false })}.</li>
+          )}
           <li>Bank-transfer orders are dispatched once the funds reach our account.</li>
         </ul>
         <h2>4. Delivery, returns and warranty</h2>
@@ -65,7 +68,7 @@ export const policies: PolicyDoc[] = [
           <li>Basic technical data (browser type, pages visited) through essential cookies, and analytics cookies only if you accept them.</li>
         </ul>
         <h2>Card payments</h2>
-        <p>Card payments are handled entirely by <b>PayHere</b>. Your card number is entered on PayHere’s secure page and is never sent to or stored by us.</p>
+        <p>Card payments are handled entirely by <b>{cardGateway.name}</b>. Your card number is entered on {cardGateway.name}’s secure page and is never sent to or stored by us.</p>
         <h2>How we use your data</h2>
         <ul>
           <li>To process, deliver and support your orders and warranty claims.</li>
@@ -73,7 +76,7 @@ export const policies: PolicyDoc[] = [
           <li>To send offers — only if you have opted in. You can opt out at any time.</li>
         </ul>
         <h2>Sharing</h2>
-        <p>We share only what is needed with our courier partners (name, phone, address) and payment provider (PayHere). We never sell your personal data.</p>
+        <p>We share only what is needed with our courier partners (name, phone, address) and payment provider ({cardGateway.name}). We never sell your personal data.</p>
         <h2>Cookies</h2>
         <p>Essential cookies keep your cart and checkout working. Analytics or advertising cookies are loaded only after you accept them in the cookie notice.</p>
         <h2>Retention and your rights</h2>
@@ -86,28 +89,27 @@ export const policies: PolicyDoc[] = [
   {
     slug: 'refunds',
     title: 'Returns & Refunds Policy',
-    summary: 'How returns, cancellations and refunds work.',
+    summary: 'Cancellations, damaged or faulty items, and refunds.',
+    // DRAFT — client to approve. Interim wording from the 21 Oct 2026 kick-off: no change-of-mind returns or
+    // exchanges for now; the full returns flow is R2. Keep this page — the payment gateway reviews it.
     body: () => (
       <>
         <h2>Order cancellation</h2>
         <p>You may cancel an order free of charge any time before it is dispatched. Contact us by phone or WhatsApp with your order number. Paid amounts are refunded in full.</p>
-        <h2>Change-of-mind returns</h2>
-        <ul>
-          <li>Unopened items in their original sealed packaging may be returned within <b>{shop.returns.changeOfMindDays} days</b> of delivery or collection, with the receipt / order number.</li>
-          <li>Opened items, digital codes, gift cards and items damaged after delivery cannot be returned for change of mind.</li>
-          <li>Return delivery costs for change-of-mind returns are paid by the customer.</li>
-        </ul>
+        <h2>Change of mind</h2>
+        <p>We do not accept returns or exchanges for change of mind at this time. Please check the product details and compatibility before you order — if you are unsure, ask us on WhatsApp first.</p>
         <h2>Damaged, faulty or wrong items</h2>
         <ul>
-          <li>Please check your parcel on delivery. If an item arrives damaged, faulty or is not what you ordered, contact us within <b>48 hours</b> with photos or a short video.</li>
-          <li>We will arrange a replacement or a full refund, including delivery charges, at no cost to you.</li>
-          <li>Faults that appear later are handled under our <Link to="/policies/warranty">Warranty Policy</Link>.</li>
+          <li>Please check your item when you receive or collect it. If it is damaged, faulty or not what you ordered, contact us within <b>{shop.returns.reportProblemHours} hours</b> with your order number and photos or a short video.</li>
+          <li>Keep the item with its original box and all accessories until we have resolved the problem.</li>
+          <li>After inspecting the item we will repair it, replace it or give you a full refund, including the delivery charge, at no cost to you.</li>
         </ul>
+        <h2>Warranty claims</h2>
+        <p>Faults that appear after the first {shop.returns.reportProblemHours} hours are handled under the product’s warranty, as shown on the product page and your invoice — see our <Link to="/policies/warranty">Warranty Policy</Link>.</p>
         <h2>How refunds are paid</h2>
         <ul>
-          <li><b>Card payments (PayHere):</b> refunded to the same card. Refunds are processed within <b>7 working days</b> of approval; your bank may take a further 5–10 working days to show the amount.</li>
-          <li><b>Bank transfer and cash on delivery:</b> refunded by bank transfer to your account within 7 working days of approval.</li>
-          <li>Returned items are inspected before a refund is approved.</li>
+          <li><b>Card payments ({cardGateway.name}):</b> refunded to the same card. Refunds are processed within <b>7 working days</b> of approval; your bank may take a further 5–10 working days to show the amount.</li>
+          <li><b>Bank transfer and other payments:</b> refunded by bank transfer to your account within 7 working days of approval.</li>
         </ul>
         <h2>Contact</h2>
         <Contact />
@@ -124,9 +126,11 @@ export const policies: PolicyDoc[] = [
         <p>We deliver island-wide across Sri Lanka through {shop.delivery.courier}.</p>
         <h2>Charges</h2>
         <ul>
-          <li>Flat island-wide delivery fee: <b>{formatLKR(shop.delivery.flatFee)}</b> per order.</li>
-          <li><b>Free delivery</b> on orders of {formatLKR(shop.delivery.freeAbove)} or more.</li>
+          <li>Island-wide delivery is charged by the total weight of your order: <b>{formatLKR(shop.delivery.rates.baseFee)}</b> for up to {shop.delivery.rates.baseKg} kg, plus <b>{formatLKR(shop.delivery.rates.perExtraKg)}</b> for each additional kg or part of a kg.</li>
+          <li>For example, a 2.3 kg parcel costs {formatLKR(feeForWeight(2.3))} ({formatLKR(shop.delivery.rates.baseFee)} + {extraKg(2.3)} × {formatLKR(shop.delivery.rates.perExtraKg)}).</li>
+          <li>The exact delivery charge is shown at checkout before you place your order.</li>
           <li><b>Store pickup</b> from our {shop.city} shop is always free.</li>
+          <li>From time to time we offer free-delivery promo codes; the terms are shown with each offer.</li>
         </ul>
         <h2>Delivery times</h2>
         <ul>
@@ -134,12 +138,16 @@ export const policies: PolicyDoc[] = [
           <li>Typical delivery time: <b>{shop.delivery.days}</b> after dispatch. Remote areas may take longer.</li>
           <li>Once dispatched, we send you the courier name and tracking number by WhatsApp.</li>
         </ul>
-        <h2>Cash on delivery</h2>
-        <p>Cash on delivery is available for orders up to {formatLKR(shop.payments.cod.max)}. We may call to confirm COD orders before dispatch.</p>
+        {shop.payments.cod.enabled && (
+          <>
+            <h2>Cash on delivery</h2>
+            <p>Cash on delivery is available for orders up to {formatLKR(shop.payments.cod.max)}. We may call to confirm COD orders before dispatch.</p>
+          </>
+        )}
         <h2>On receiving your parcel</h2>
-        <p>Please check that the package is sealed and undamaged. Report any problem within 48 hours — see our <Link to="/policies/refunds">Returns & Refunds Policy</Link>.</p>
+        <p>Please check that the package is sealed and undamaged. Report any problem within {shop.returns.reportProblemHours} hours — see our <Link to="/policies/refunds">Returns & Refunds Policy</Link>.</p>
         <h2>Store pickup</h2>
-        <p>Choose “Store pickup” at checkout. We will message you when your order is ready. Please bring your order number and the payment card or ID used.</p>
+        <p>Choose “Store pickup” at checkout. We will message you when your order is ready. Please bring your order number and the payment card or ID used.{shop.payments.payAtStore.enabled && ' You can also pay at the store when you collect.'}</p>
       </>
     ),
   },

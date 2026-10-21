@@ -1,8 +1,9 @@
-import { Check, ChevronRight, MessageCircle, RotateCcw, ShieldCheck, ShoppingBag, Store, Truck, Zap } from 'lucide-react'
+import { BadgeCheck, Check, ChevronRight, MessageCircle, ShieldCheck, ShoppingBag, Store, Truck, Zap } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { categories, productById, products } from '../data/products'
-import { formatLKR, shop, waLink } from '../config/shop'
+import { categories, productById, products, shippingWeightKg } from '../data/products'
+import { cardGateway, formatLKR, payWays, shop, waLink } from '../config/shop'
+import { feeForWeight, formatKg } from '../lib/totals'
 import { useCart } from '../store/cart'
 import ProductArt from '../components/ProductArt'
 import ProductCard from '../components/ProductCard'
@@ -29,7 +30,10 @@ function ProductView({ id }: { id: string }) {
   const related = (product.related ?? []).map(productById).filter(Boolean) as typeof products
   const more = related.length ? related : products.filter(p => p.category === product.category && p.id !== product.id)
   const out = product.stock === 'out'
-  const overCardCap = product.price > shop.payments.payhere.maxPerPayment
+  const cardCap = cardGateway.maxPerPayment
+  const overCardCap = cardCap !== null && product.price > cardCap
+  const weight = shippingWeightKg(product)
+  const { baseKg, baseFee, perExtraKg } = shop.delivery.rates
 
   return (
     <>
@@ -74,8 +78,8 @@ function ProductView({ id }: { id: string }) {
             </div>
             <p className="mt-2 text-xs text-slate-500">
               {overCardCap
-                ? `Pay by bank transfer or cash on delivery. Card payments are available for orders up to ${formatLKR(shop.payments.payhere.maxPerPayment)}.`
-                : 'Pay by card (PayHere), bank transfer or cash on delivery.'}
+                ? `Pay by ${payWays({ card: false })}. Card payments are available for orders up to ${formatLKR(cardCap)}.`
+                : `Pay by ${payWays()}.`}
             </p>
 
             {product.variants && (
@@ -119,9 +123,9 @@ function ProductView({ id }: { id: string }) {
           </div>
 
           <ul className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
-            <li className="flex items-center gap-2 rounded-xl bg-white p-3 text-slate-600"><Truck className="h-5 w-5 shrink-0 text-navy" /> Island-wide delivery</li>
+            <li className="flex items-center gap-2 rounded-xl bg-white p-3 text-slate-600"><Truck className="h-5 w-5 shrink-0 text-navy" /> Island-wide delivery {formatLKR(feeForWeight(weight))}</li>
             <li className="flex items-center gap-2 rounded-xl bg-white p-3 text-slate-600"><Store className="h-5 w-5 shrink-0 text-navy" /> Free pickup in {shop.city}</li>
-            <li className="flex items-center gap-2 rounded-xl bg-white p-3 text-slate-600"><RotateCcw className="h-5 w-5 shrink-0 text-navy" /> {shop.returns.changeOfMindDays}-day returns*</li>
+            <li className="flex items-center gap-2 rounded-xl bg-white p-3 text-slate-600"><BadgeCheck className="h-5 w-5 shrink-0 text-navy" /> 100% genuine</li>
           </ul>
 
           <div className="mt-8">
@@ -156,9 +160,9 @@ function ProductView({ id }: { id: string }) {
               )}
               {tab === 'delivery' && (
                 <ul className="space-y-2">
-                  <li>• Island-wide delivery in {shop.delivery.days}; free on orders over {formatLKR(shop.delivery.freeAbove)}, otherwise {formatLKR(shop.delivery.flatFee)}.</li>
+                  <li>• Island-wide delivery by {shop.delivery.courier} in {shop.delivery.days}: {formatLKR(feeForWeight(weight))} for this item ({formatKg(weight)}). Delivery is charged on the total order weight — {formatLKR(baseFee)} for up to {baseKg} kg, plus {formatLKR(perExtraKg)} for each extra kg or part of a kg.</li>
                   <li>• Free store pickup from our {shop.city} shop.</li>
-                  <li>• *Unopened items can be returned within {shop.returns.changeOfMindDays} days. Faulty items are covered by warranty.</li>
+                  <li>• We don’t accept change-of-mind returns or exchanges at the moment. If an item arrives damaged, faulty or not as ordered, tell us within {shop.returns.reportProblemHours} hours. Faults after that are covered by the product’s warranty.</li>
                   <li>• Read the full <Link to="/policies/delivery" className="font-semibold text-navy underline">Delivery</Link>, <Link to="/policies/refunds" className="font-semibold text-navy underline">Returns</Link> and <Link to="/policies/warranty" className="font-semibold text-navy underline">Warranty</Link> policies.</li>
                 </ul>
               )}

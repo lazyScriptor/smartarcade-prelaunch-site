@@ -1,10 +1,10 @@
 import { CheckCircle2, Landmark, MessageCircle } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
-import { formatLKR, shop, waLink } from '../config/shop'
+import { cardGateway, formatLKR, shop, waLink } from '../config/shop'
 import { findOrder } from '../lib/orders'
 import NotFound from './NotFound'
 
-const payLabel = { payhere: 'Card (PayHere)', bank: 'Bank transfer', cod: 'Cash on delivery / at store', whatsapp: 'Confirm on WhatsApp' }
+const payLabel = { card: `Card (${cardGateway.name})`, bank: 'Bank transfer', cod: 'Cash on delivery', store: 'Pay at the store', whatsapp: 'Confirm on WhatsApp' }
 
 export default function OrderPlaced() {
   const { ref = '' } = useParams()

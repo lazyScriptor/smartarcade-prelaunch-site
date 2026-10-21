@@ -16,9 +16,6 @@ export default function CartDrawer() {
   }, [open, setOpen])
   if (!open) return null
 
-  const toFree = shop.delivery.freeAbove - subtotal
-  const pct = Math.min(100, (subtotal / shop.delivery.freeAbove) * 100)
-
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Shopping cart">
       <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
@@ -36,12 +33,6 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="border-b border-slate-100 px-5 py-3">
-              <p className="text-sm text-slate-600">
-                {toFree > 0 ? <>Add <b className="text-navy">{formatLKR(toFree)}</b> more for free delivery</> : <b className="text-emerald-600">You’ve unlocked free island-wide delivery!</b>}
-              </p>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-lime transition-all" style={{ width: `${pct}%` }} /></div>
-            </div>
             <ul className="flex-1 divide-y divide-slate-100 overflow-y-auto px-5">
               {rows.map(r => (
                 <li key={r.key} className="flex gap-4 py-4">
@@ -62,7 +53,7 @@ export default function CartDrawer() {
             </ul>
             <div className="space-y-3 border-t border-slate-100 p-5">
               <div className="flex justify-between text-base"><span className="text-slate-600">Subtotal</span><b className="text-navy">{formatLKR(subtotal)}</b></div>
-              <p className="text-xs text-slate-500">Delivery calculated at checkout.</p>
+              <p className="text-xs text-slate-500">Island-wide delivery from {formatLKR(shop.delivery.rates.baseFee)} (by weight), calculated at checkout · free store pickup in {shop.city}.</p>
               <Link to="/checkout" onClick={() => setOpen(false)} className="btn btn-lime w-full">Checkout</Link>
               <Link to="/cart" onClick={() => setOpen(false)} className="btn btn-ghost w-full">View cart</Link>
             </div>

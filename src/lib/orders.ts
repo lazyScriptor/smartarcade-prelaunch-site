@@ -1,7 +1,7 @@
 import { load, save } from './storage'
 import type { DeliveryMethod } from './totals'
 
-export type PaymentMethod = 'payhere' | 'bank' | 'cod' | 'whatsapp'
+export type PaymentMethod = 'card' | 'bank' | 'cod' | 'store' | 'whatsapp'
 
 export interface PlacedOrder {
   ref: string

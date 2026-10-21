@@ -1,7 +1,12 @@
-// Neutral text badges. Swap for PayHere's official payment-methods banner once the merchant account is approved.
+import { cardGateway, shop } from '../config/shop'
+
+// Neutral text badges. Swap for the card gateway's official payment-methods banner once the merchant account is approved.
 export default function PaymentBadges({ dark = false }: { dark?: boolean }) {
   const base = dark ? 'border-white/15 bg-white/5 text-white/90' : 'border-slate-200 bg-white text-slate-700'
-  const items = ['VISA', 'Mastercard', 'AMEX', 'PayHere', 'Bank Transfer', 'Cash on Delivery']
+  const { bankTransfer, cod } = shop.payments
+  const items = ['VISA', 'Mastercard', 'AMEX', cardGateway.name, bankTransfer.enabled && 'Bank Transfer', cod.enabled && 'Cash on Delivery'].filter(
+    (i): i is string => !!i,
+  )
   return (
     <div className="flex flex-wrap gap-2">
       {items.map(i => (

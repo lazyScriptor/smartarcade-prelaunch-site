@@ -2,7 +2,7 @@ import { Menu, Phone, ShoppingBag, Truck, ShieldCheck, X, CreditCard } from 'luc
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { categories } from '../data/products'
-import { formatLKR, shop } from '../config/shop'
+import { formatLKR, payWays, shop } from '../config/shop'
 import { useCart } from '../store/cart'
 import Logo from './Logo'
 import SearchBox from './SearchBox'
@@ -22,9 +22,9 @@ export default function Header() {
     <header className="sticky top-0 z-40">
       <div className="bg-lime text-navy">
         <div className="container-x flex h-9 items-center justify-center gap-6 overflow-hidden text-xs font-semibold md:justify-between">
-          <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> Free island-wide delivery above {formatLKR(shop.delivery.freeAbove)}</span>
+          <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> <span>Island-wide delivery from {formatLKR(shop.delivery.rates.baseFee)}<span className="hidden sm:inline"> · free store pickup in {shop.city}</span></span></span>
           <span className="hidden items-center gap-1.5 md:flex"><ShieldCheck className="h-3.5 w-3.5" /> Warranty on every item</span>
-          <span className="hidden items-center gap-1.5 md:flex"><CreditCard className="h-3.5 w-3.5" /> Card · Bank transfer · Cash on delivery</span>
+          <span className="hidden items-center gap-1.5 lg:flex"><CreditCard className="h-3.5 w-3.5" /> Pay by {payWays()}</span>
           <a href={`tel:${shop.phoneHref}`} className="hidden items-center gap-1.5 lg:flex"><Phone className="h-3.5 w-3.5" /> {shop.phone}</a>
         </div>
       </div>
@@ -99,6 +99,7 @@ export default function Header() {
               <Link className="rounded-lg px-3 py-2.5 hover:bg-white/5" to="/faq">FAQ</Link>
             </nav>
             <a href={`tel:${shop.phoneHref}`} className="btn btn-lime mt-auto"><Phone className="h-4 w-4" /> {shop.phone}</a>
+            <a href={`tel:${shop.phoneAltHref}`} className="mt-3 text-center text-sm text-white/70 hover:text-white">or call {shop.phoneAlt}</a>
           </div>
         </div>
       )}

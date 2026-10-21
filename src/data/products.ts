@@ -19,6 +19,7 @@ export interface Product {
   condition: Condition
   stock: 'in' | 'low' | 'out'
   warranty: string
+  weightKg?: number // packed shipping weight; falls back to the category default
   short: string
   description: string
   highlights: string[]
@@ -31,12 +32,13 @@ export interface Product {
   related?: string[]
 }
 
-export const categories: { id: CategoryId; name: string; blurb: string; icon: ArtIcon }[] = [
-  { id: 'consoles', name: 'Consoles', blurb: 'PlayStation, Nintendo & Xbox', icon: 'console' },
-  { id: 'controllers', name: 'Controllers', blurb: 'DualSense, Pro & Xbox pads', icon: 'controller' },
-  { id: 'audio', name: 'Headsets & Audio', blurb: 'Hear every footstep', icon: 'headset' },
-  { id: 'accessories', name: 'Accessories', blurb: 'Chargers, storage & cases', icon: 'drive' },
-  { id: 'gadgets', name: 'Smart Gadgets', blurb: 'Wearables, speakers & more', icon: 'watch' },
+// weightKg = default packed shipping weight for the category (sample values — replace with real weights).
+export const categories: { id: CategoryId; name: string; blurb: string; icon: ArtIcon; weightKg: number }[] = [
+  { id: 'consoles', name: 'Consoles', blurb: 'PlayStation, Nintendo & Xbox', icon: 'console', weightKg: 4.5 },
+  { id: 'controllers', name: 'Controllers', blurb: 'DualSense, Pro & Xbox pads', icon: 'controller', weightKg: 0.5 },
+  { id: 'audio', name: 'Headsets & Audio', blurb: 'Hear every footstep', icon: 'headset', weightKg: 0.6 },
+  { id: 'accessories', name: 'Accessories', blurb: 'Chargers, storage & cases', icon: 'drive', weightKg: 0.3 },
+  { id: 'gadgets', name: 'Smart Gadgets', blurb: 'Wearables, speakers & more', icon: 'watch', weightKg: 0.4 },
 ]
 
 const navy = '#111141'
@@ -108,6 +110,7 @@ export const products: Product[] = [
     condition: 'Brand New',
     stock: 'in',
     warranty: '1 year shop warranty',
+    weightKg: 1.6,
     short: 'Bigger screen, magnetic Joy-Con 2 and 4K docked play.',
     description:
       'The next Nintendo Switch: a larger 1080p screen, new magnetic Joy-Con 2 controllers with mouse controls, and up to 4K output on your TV.',
@@ -127,6 +130,7 @@ export const products: Product[] = [
     condition: 'Brand New',
     stock: 'in',
     warranty: '1 year shop warranty',
+    weightKg: 1.4,
     short: 'Vivid 7" OLED screen, 64GB storage and a wide adjustable stand.',
     description: 'Play at home on the TV or on the go with a vibrant 7-inch OLED screen and enhanced audio.',
     highlights: ['7" OLED screen', '64GB internal storage', 'Wired LAN port on dock', 'Enhanced audio'],
@@ -399,6 +403,7 @@ export const products: Product[] = [
     condition: 'Brand New',
     stock: 'low',
     warranty: '1 year shop warranty',
+    weightKg: 1.5,
     short: 'Mixed reality headset – games, fitness and entertainment.',
     description: 'Step into mixed reality with full-colour passthrough, Touch Plus controllers and a huge game library.',
     highlights: ['Full-colour mixed reality', 'Touch Plus controllers', '128GB storage'],
@@ -409,5 +414,8 @@ export const products: Product[] = [
 ]
 
 export const productById = (id: string) => products.find(p => p.id === id)
+
+// Shipping weight is inherited: the product's own weight, else its category default.
+export const shippingWeightKg = (p: Product) => p.weightKg ?? categories.find(c => c.id === p.category)!.weightKg
 
 export const brands = Array.from(new Set(products.map(p => p.brand))).sort()

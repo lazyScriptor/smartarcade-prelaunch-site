@@ -2,14 +2,14 @@ import { ArrowRight, ShoppingBag, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { formatLKR, shop } from '../config/shop'
 import { useCart } from '../store/cart'
-import { deliveryFee } from '../lib/totals'
+import { cartWeightKg, deliveryFee, formatKg } from '../lib/totals'
 import PageHeader from '../components/PageHeader'
 import ProductArt from '../components/ProductArt'
 import QtyStepper from '../components/QtyStepper'
 
 export default function Cart() {
   const { rows, subtotal, setQty, remove } = useCart()
-  const fee = deliveryFee(subtotal, 'delivery')
+  const fee = deliveryFee(rows, 'delivery')
   return (
     <>
       <PageHeader title="Shopping cart" crumbs={[{ label: 'Cart' }]} />
@@ -43,10 +43,10 @@ export default function Cart() {
               <h2 className="text-lg font-bold text-navy">Order summary</h2>
               <dl className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between"><dt className="text-slate-600">Subtotal</dt><dd className="font-semibold">{formatLKR(subtotal)}</dd></div>
-                <div className="flex justify-between"><dt className="text-slate-600">Delivery (island-wide)</dt><dd className="font-semibold">{fee ? formatLKR(fee) : 'Free'}</dd></div>
+                <div className="flex justify-between"><dt className="text-slate-600">Delivery ({formatKg(cartWeightKg(rows))}, by weight)</dt><dd className="font-semibold">{fee ? formatLKR(fee) : 'Free'}</dd></div>
                 <div className="flex justify-between border-t border-slate-100 pt-3 text-base"><dt className="font-bold">Estimated total</dt><dd className="font-display text-xl font-extrabold text-navy">{formatLKR(subtotal + fee)}</dd></div>
               </dl>
-              <p className="mt-3 text-xs text-slate-500">Choose free store pickup in {shop.city} at checkout.</p>
+              <p className="mt-3 text-xs text-slate-500">Island-wide delivery is charged by weight. Choose free store pickup in {shop.city} at checkout.</p>
               <Link to="/checkout" className="btn btn-lime mt-5 w-full">Proceed to checkout <ArrowRight className="h-4 w-4" /></Link>
               <Link to="/shop" className="btn btn-ghost mt-3 w-full">Continue shopping</Link>
             </aside>
