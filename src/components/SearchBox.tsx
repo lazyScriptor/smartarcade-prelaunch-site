@@ -1,9 +1,8 @@
 import { Search } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { products } from '../data/products'
-import { formatLKR } from '../config/shop'
-import ProductArt from './ProductArt'
+import { catalogProducts, catalogCategories } from '../data/catalog'
+import CatalogImage from './CatalogImage'
 
 export default function SearchBox({ onDone }: { onDone?: () => void }) {
   const [q, setQ] = useState('')
@@ -14,7 +13,7 @@ export default function SearchBox({ onDone }: { onDone?: () => void }) {
   const hits = useMemo(() => {
     const t = q.trim().toLowerCase()
     if (t.length < 2) return []
-    return products.filter(p => `${p.name} ${p.brand} ${p.category}`.toLowerCase().includes(t)).slice(0, 5)
+    return catalogProducts.filter(p => `${p.name} ${p.nameSi} ${p.category}`.toLowerCase().includes(t)).slice(0, 5)
   }, [q])
 
   const go = (path: string) => {
@@ -39,7 +38,7 @@ export default function SearchBox({ onDone }: { onDone?: () => void }) {
         onChange={e => setQ(e.target.value)}
         onFocus={() => setFocus(true)}
         onBlur={() => (blurTimer.current = window.setTimeout(() => setFocus(false), 150))}
-        placeholder="Search consoles, controllers, headsets…"
+        placeholder="Search the product catalogue…"
         aria-label="Search products"
         className="w-full rounded-xl border border-white/10 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-lime"
       />
@@ -52,12 +51,12 @@ export default function SearchBox({ onDone }: { onDone?: () => void }) {
               onMouseDown={() => go(`/product/${p.id}`)}
               className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-slate-50"
             >
-              <span className="h-10 w-10 shrink-0 overflow-hidden rounded-lg">
-                <ProductArt product={p} size="sm" />
+              <span className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-slate-50">
+                <CatalogImage src={p.cardImage} alt="" className="h-full w-full object-contain p-1" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium text-slate-900">{p.name}</span>
-                <span className="text-xs text-slate-500">{formatLKR(p.price)}</span>
+                <span className="text-xs capitalize text-slate-500">{catalogCategories.find(c => c.id === p.category)?.name}</span>
               </span>
             </button>
           ))}

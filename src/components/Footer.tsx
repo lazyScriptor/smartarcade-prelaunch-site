@@ -1,7 +1,7 @@
 import { Clock, Facebook, Mail, MapPin, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { categories } from '../data/products'
-import { cardGateway, shop } from '../config/shop'
+import { visibleCatalogCategories } from '../data/catalog'
+import { cardGateway, payWays, shop } from '../config/shop'
 import { policies } from '../content/policies'
 import Logo from './Logo'
 import PaymentBadges from './PaymentBadges'
@@ -13,7 +13,7 @@ export default function Footer() {
         <div>
           <Logo />
           <p className="mt-4 text-sm leading-relaxed text-white/70">
-            Gaming consoles, accessories and smart gadgets from {shop.city}. Genuine products, honest prices and warranty on selected items.
+            Browse product photos and details from Smart Arcade in {shop.city}. Prices are being set through a competitive review; contact us to confirm availability.
           </p>
           <div className="mt-5"><PaymentBadges dark /></div>
         </div>
@@ -21,7 +21,7 @@ export default function Footer() {
           <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-lime">Shop</h3>
           <ul className="space-y-2.5 text-sm text-white/75">
             <li><Link className="hover:text-white" to="/shop">All products</Link></li>
-            {categories.map(c => (
+              {visibleCatalogCategories.map(c => (
               <li key={c.id}><Link className="hover:text-white" to={`/shop/${c.id}`}>{c.name}</Link></li>
             ))}
           </ul>
@@ -58,8 +58,12 @@ export default function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-2 py-5 text-xs text-white/50 md:flex-row">
-          <span>© {new Date().getFullYear()} {shop.legalName}. All rights reserved. Prices in Sri Lankan Rupees (LKR).</span>
-          <span>Secure card payments processed by {cardGateway.name}.</span>
+          <span>© {new Date().getFullYear()} {shop.legalName}. All rights reserved.</span>
+          <span>{shop.payments.card.enabled
+            ? `Secure card payments processed by ${cardGateway.name}.`
+            : payWays()
+              ? `Current payment options: ${payWays()}.`
+              : 'Payment options will be shown when live ordering is enabled.'}</span>
         </div>
       </div>
     </footer>

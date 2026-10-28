@@ -1,16 +1,16 @@
-import { Menu, Phone, ShoppingBag, Truck, ShieldCheck, X, CreditCard } from 'lucide-react'
+import { Menu, Phone, ShieldCheck, X, MessageCircle, PackageSearch, ShoppingBag } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { categories } from '../data/products'
-import { formatLKR, payWays, shop } from '../config/shop'
-import { useCart } from '../store/cart'
+import { catalogProducts, visibleCatalogCategories } from '../data/catalog'
+import { shop, waLink } from '../config/shop'
 import Logo from './Logo'
 import SearchBox from './SearchBox'
+import { useCart } from '../store/cart'
 
 export default function Header() {
-  const { count, setOpen } = useCart()
   const [menu, setMenu] = useState(false)
   const { pathname } = useLocation()
+  const { count } = useCart()
   useEffect(() => {
     setMenu(false)
   }, [pathname])
@@ -22,9 +22,11 @@ export default function Header() {
     <header className="sticky top-0 z-40">
       <div className="bg-lime text-navy">
         <div className="container-x flex h-9 items-center justify-center gap-6 overflow-hidden text-xs font-semibold md:justify-between">
-          <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> <span>Island-wide delivery from {formatLKR(shop.delivery.rates.baseFee)}<span className="hidden sm:inline"> · free store pickup in {shop.city}</span></span></span>
-          <span className="hidden items-center gap-1.5 md:flex"><ShieldCheck className="h-3.5 w-3.5" /> Warranty on selected items</span>
-          <span className="hidden items-center gap-1.5 lg:flex"><CreditCard className="h-3.5 w-3.5" /> Pay by {payWays()}</span>
+          <span className="flex items-center gap-1.5"><PackageSearch className="h-3.5 w-3.5" /> <span>{catalogProducts.length} products in the catalogue</span></span>
+          <span className="hidden items-center gap-1.5 md:flex"><ShieldCheck className="h-3.5 w-3.5" /> Warranty details where supplied</span>
+          <span className="hidden items-center gap-1.5 lg:flex">
+            <MessageCircle className="h-3.5 w-3.5" /> Product pricing is being added
+          </span>
           <a href={`tel:${shop.phoneHref}`} className="hidden items-center gap-1.5 lg:flex"><Phone className="h-3.5 w-3.5" /> {shop.phone}</a>
         </div>
       </div>
@@ -39,6 +41,10 @@ export default function Header() {
             <SearchBox />
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <Link to="/cart" className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl text-white transition hover:bg-white/10" aria-label={`Cart, ${count} items`}>
+              <ShoppingBag className="h-5 w-5" />
+              {count > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-lime px-1 text-[10px] font-bold text-navy">{count}</span>}
+            </Link>
             <a href={`tel:${shop.phoneHref}`} className="hidden items-center gap-2 rounded-xl px-3 py-2 text-white/90 hover:bg-white/5 lg:flex">
               <Phone className="h-5 w-5 text-lime" />
               <span className="text-left leading-tight">
@@ -46,18 +52,7 @@ export default function Header() {
                 <span className="text-sm font-semibold">{shop.phone}</span>
               </span>
             </a>
-            <button
-              onClick={() => setOpen(true)}
-              className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-white/15"
-              aria-label={`Open cart, ${count} items`}
-            >
-              <ShoppingBag className="h-5 w-5" />
-              {count > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-lime px-1 text-[11px] font-bold text-navy">
-                  {count}
-                </span>
-              )}
-            </button>
+            <a href={waLink(`Hi ${shop.name}, I have a question about your product catalogue.`)} target="_blank" rel="noreferrer" className="btn btn-lime py-2.5 text-sm"><MessageCircle className="h-4 w-4" /> Contact us</a>
           </div>
         </div>
         <div className="container-x pb-3 md:hidden">
@@ -67,10 +62,9 @@ export default function Header() {
           <div className="container-x no-scrollbar flex h-12 items-center gap-1 overflow-x-auto">
             <NavLink to="/" end className={navCls}>Home</NavLink>
             <NavLink to="/shop" end className={navCls}>All products</NavLink>
-            {categories.map(c => (
+            {visibleCatalogCategories.map(c => (
               <NavLink key={c.id} to={`/shop/${c.id}`} className={navCls}>{c.name}</NavLink>
             ))}
-            <NavLink to="/shop?condition=Pre-owned" className={() => navCls({ isActive: false })}>Pre-owned</NavLink>
             <span className="flex-1" />
             <NavLink to="/about" className={navCls}>About</NavLink>
             <NavLink to="/contact" className={navCls}>Contact</NavLink>
@@ -89,10 +83,9 @@ export default function Header() {
             <nav className="flex flex-col gap-1 text-base">
               <Link className="rounded-lg px-3 py-2.5 hover:bg-white/5" to="/">Home</Link>
               <Link className="rounded-lg px-3 py-2.5 hover:bg-white/5" to="/shop">All products</Link>
-              {categories.map(c => (
+              {visibleCatalogCategories.map(c => (
                 <Link key={c.id} className="rounded-lg px-3 py-2.5 hover:bg-white/5" to={`/shop/${c.id}`}>{c.name}</Link>
               ))}
-              <Link className="rounded-lg px-3 py-2.5 hover:bg-white/5" to="/shop?condition=Pre-owned">Pre-owned</Link>
               <hr className="my-3 border-white/10" />
               <Link className="rounded-lg px-3 py-2.5 hover:bg-white/5" to="/about">About us</Link>
               <Link className="rounded-lg px-3 py-2.5 hover:bg-white/5" to="/contact">Contact & location</Link>

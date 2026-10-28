@@ -14,6 +14,8 @@ const Contact = () => (
   </ul>
 )
 
+const currentPaymentWays = payWays()
+
 export const policies: PolicyDoc[] = [
   {
     slug: 'terms',
@@ -31,17 +33,24 @@ export const policies: PolicyDoc[] = [
         </ul>
         <h2>2. Orders</h2>
         <ul>
+          <li>A cart sent to us on WhatsApp is an order request, not a confirmed order. We confirm stock, the final price and delivery with you first.</li>
           <li>An order is confirmed when we accept it and payment is received{shop.payments.cod.enabled && ' (or, for cash on delivery, when we confirm it by phone or WhatsApp)'}.</li>
           <li>We may refuse or cancel an order if stock is unavailable, the payment fails or is suspected to be fraudulent, or delivery details cannot be verified. Any amount paid will be refunded in full.</li>
         </ul>
         <h2>3. Payment</h2>
         <ul>
-          <li>We accept Visa, Mastercard and American Express cards through <b>{cardGateway.name}</b>, and {payWays({ card: false })}.</li>
-          <li>Card payments are processed securely by {cardGateway.name}. We never see or store your full card details.</li>
-          {cardGateway.maxPerPayment !== null && (
-            <li>A single card payment is limited to {formatLKR(cardGateway.maxPerPayment)}. Larger orders can be paid by {payWays({ card: false })}.</li>
+          <li>{currentPaymentWays
+            ? `We currently accept ${currentPaymentWays}.`
+            : 'For now, send an order request through WhatsApp. We will confirm the payment method before accepting it.'}</li>
+          {shop.payments.card.enabled && (
+            <>
+              <li>Card payments are processed securely by <b>{cardGateway.name}</b>. We do not receive your full card details.</li>
+              {cardGateway.maxPerPayment !== null && (
+                <li>A single card payment is limited to {formatLKR(cardGateway.maxPerPayment)}. Ask us about another available payment method for larger orders.</li>
+              )}
+            </>
           )}
-          <li>Bank-transfer orders are dispatched once the funds reach our account.</li>
+          {shop.payments.bankTransfer.enabled && <li>Bank-transfer orders are dispatched once the funds reach our account.</li>}
         </ul>
         <h2>4. Delivery, returns and warranty</h2>
         <p>Please read our <Link to="/policies/delivery">Delivery Policy</Link>, <Link to="/policies/refunds">Returns & Refunds Policy</Link> and <Link to="/policies/warranty">Warranty Policy</Link>, which form part of these terms.</p>
@@ -60,27 +69,28 @@ export const policies: PolicyDoc[] = [
     summary: 'What personal data we collect and how we protect it.',
     body: () => (
       <>
-        <p>{shop.legalName} respects your privacy and handles personal data in line with the Personal Data Protection Act No. 9 of 2022 of Sri Lanka.</p>
-        <h2>What we collect</h2>
+        <p>This page describes how the current Smart Arcade pre-launch site handles information. The policy wording should be reviewed and approved by the business before the site is used for live sales.</p>
+        <h2>Information and browser storage</h2>
         <ul>
-          <li>Details you give us when ordering or contacting us: name, mobile number, email, delivery address and order notes.</li>
-          <li>Order and warranty records, including product serial numbers.</li>
-          <li>Basic technical data (browser type, pages visited) through essential cookies, and analytics cookies only if you accept them.</li>
+          <li>This site takes no payments. The cart's “Send request on WhatsApp” form and the Contact form ask for your name and mobile number (and, for delivery, your address and notes) only to prepare a WhatsApp message. They are not sent to or saved by this site.</li>
+          <li>Your browser stores the items in your cart and whether you dismissed the privacy notice, so they are still there when you come back. This stays on your device.</li>
+          <li>Contact links open WhatsApp with a prefilled message. The site does not send it; Smart Arcade receives it only if you tap Send in WhatsApp.</li>
         </ul>
         <h2>Card payments</h2>
-        <p>Card payments are handled entirely by <b>{cardGateway.name}</b>. Your card number is entered on {cardGateway.name}’s secure page and is never sent to or stored by us.</p>
+        <p>{shop.payments.card.enabled
+          ? <>Card payments are handled by <b>{cardGateway.name}</b>. Your card details are entered on its secure page and are not sent to or stored by Smart Arcade.</>
+          : 'Card checkout is not active yet. Do not send card numbers or security codes through WhatsApp.'}</p>
         <h2>How we use your data</h2>
         <ul>
-          <li>To process, deliver and support your orders and warranty claims.</li>
-          <li>To contact you about your order by phone, SMS, WhatsApp or email.</li>
-          <li>To send offers — only if you have opted in. You can opt out at any time.</li>
+          <li>To respond to a request you send us and, if we accept an order, to arrange payment, delivery and support.</li>
+          <li>To contact you about that request or order using the details you sent.</li>
         </ul>
         <h2>Sharing</h2>
-        <p>We share only what is needed with our courier partners (name, phone, address) and payment provider ({cardGateway.name}). We never sell your personal data.</p>
-        <h2>Cookies</h2>
-        <p>Essential cookies keep your cart and checkout working. Analytics or advertising cookies are loaded only after you accept them in the cookie notice.</p>
+        <p>Product photos are loaded from Daraz's image host, which receives the browser request needed to display each image. If you send a message through WhatsApp, WhatsApp/Meta processes it under its own terms. Google Fonts are loaded from Google, and the Contact page embeds Google Maps; those services may receive technical request data when your browser loads them. This site has no payment checkout, analytics or advertising tracker installed.</p>
+        <h2>Cookies and browser storage</h2>
+        <p>This version uses browser storage to remember your cart and the privacy-notice dismissal. It does not currently use analytics or advertising cookies.</p>
         <h2>Retention and your rights</h2>
-        <p>We keep order records for as long as required for accounting and warranty purposes. You may ask to see, correct or delete your personal data by contacting us.</p>
+        <p>Clear this site's browser data to remove your saved cart and the privacy-notice dismissal. If you send a message to Smart Arcade, contact us to ask about access, correction or deletion of the copy we receive. Records may be retained when needed for an order or warranty.</p>
         <h2>Contact</h2>
         <Contact />
       </>
@@ -108,7 +118,7 @@ export const policies: PolicyDoc[] = [
         <p>Faults that appear after the first {shop.returns.reportProblemHours} hours are handled under the product’s warranty, as shown on the product page and your invoice — see our <Link to="/policies/warranty">Warranty Policy</Link>.</p>
         <h2>How refunds are paid</h2>
         <ul>
-          <li><b>Card payments ({cardGateway.name}):</b> refunded to the same card. Refunds are processed within <b>7 working days</b> of approval; your bank may take a further 5–10 working days to show the amount.</li>
+          {shop.payments.card.enabled && <li><b>Card payments ({cardGateway.name}):</b> refunded to the same card. Refunds are processed within <b>7 working days</b> of approval; your bank may take a further 5–10 working days to show the amount.</li>}
           <li><b>Bank transfer and other payments:</b> refunded by bank transfer to your account within 7 working days of approval.</li>
         </ul>
         <h2>Contact</h2>
@@ -128,7 +138,7 @@ export const policies: PolicyDoc[] = [
         <ul>
           <li>Island-wide delivery is charged by the total weight of your order: <b>{formatLKR(shop.delivery.rates.baseFee)}</b> for up to {shop.delivery.rates.baseKg} kg, plus <b>{formatLKR(shop.delivery.rates.perExtraKg)}</b> for each additional kg or part of a kg.</li>
           <li>For example, a 2.3 kg parcel costs {formatLKR(feeForWeight(2.3))} ({formatLKR(shop.delivery.rates.baseFee)} + {extraKg(2.3)} × {formatLKR(shop.delivery.rates.perExtraKg)}).</li>
-          <li>The exact delivery charge is shown at checkout before you place your order.</li>
+          <li>We confirm the exact delivery charge with you on WhatsApp, based on the weight of your order, before anything is dispatched.</li>
           <li><b>Store pickup</b> from our {shop.city} shop is always free.</li>
           <li>From time to time we offer free-delivery promo codes; the terms are shown with each offer.</li>
         </ul>
@@ -147,7 +157,7 @@ export const policies: PolicyDoc[] = [
         <h2>On receiving your parcel</h2>
         <p>Please check that the package is sealed and undamaged. Report any problem within {shop.returns.reportProblemHours} hours — see our <Link to="/policies/refunds">Returns & Refunds Policy</Link>.</p>
         <h2>Store pickup</h2>
-        <p>Choose “Store pickup” at checkout. We will message you when your order is ready. Please bring your order number and the payment card or ID used.{shop.payments.payAtStore.enabled && ' You can also pay at the store when you collect.'}</p>
+        <p>Choose “Store pickup” on your order request. We will message you when your order is ready. Please bring your WhatsApp confirmation and a photo ID.{shop.payments.payAtStore.enabled && ' You can also pay at the store when you collect.'}</p>
       </>
     ),
   },

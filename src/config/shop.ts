@@ -13,8 +13,8 @@ const cardGateways: Record<CardProvider, { name: string; maxPerPayment: number |
 export const shop = {
   name: 'Smart Arcade',
   tagline: 'Level up your game.',
-  legalName: 'Smart Arcade', // TBC: registered business name + BR no. (the payment gateway checks these match)
-  brNumber: '', // TBC
+  legalName: 'Smart Arcade', // TBC: exact registered business name for public display
+  brNumber: '', // TBC for the payment-provider application; do not publish unless required
   city: 'Moratuwa',
   country: 'Sri Lanka',
   address: 'Moratuwa, Sri Lanka', // TBC: full street address
@@ -54,22 +54,23 @@ export const shop = {
       // Online card gateway — the client may choose Payable (Payments.lk) instead of PayHere.
       // Turned on once the gateway approves the merchant account and the checkout integration is live.
       provider: 'PayHere' as CardProvider,
-      enabled: false,
+      enabled: false as boolean,
     },
     bankTransfer: {
-      enabled: true,
+      // Enable only after the client supplies and verifies the public account details.
+      enabled: false as boolean,
       bank: 'TBC', // TBC: bank, branch, account name and number
       branch: 'TBC',
       accountName: 'TBC',
       accountNumber: 'TBC',
     },
-    cod: { enabled: false, max: 100000 }, // no cash on delivery for now (kick-off 21 Oct 2026)
-    payAtStore: { enabled: false }, // pay when collecting a store-pickup order (settling web orders at the POS is R2)
-    whatsapp: { enabled: true },
+    cod: { enabled: false as boolean, max: 100000 }, // no cash on delivery for now (kick-off 21 Oct 2026)
+    payAtStore: { enabled: false as boolean }, // pay when collecting a store-pickup order (settling web orders at the POS is R2)
+    whatsapp: { enabled: true as boolean },
   },
   // No change-of-mind returns or exchanges for now (kick-off 21 Oct 2026); return rules come in R2.
   returns: { reportProblemHours: 48 },
-  policyUpdated: '21 October 2026',
+  policyUpdated: '2026-10-28',
 } as const
 
 export const cardGateway = cardGateways[shop.payments.card.provider]
@@ -81,11 +82,12 @@ export const waLink = (text: string) => `https://wa.me/${shop.whatsapp}?text=${e
 const listOr = (items: string[]) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} or ${items[items.length - 1]}` : items[0] ?? '')
 
 // Ways to pay, following the switches above — e.g. "card (PayHere) or bank transfer".
-export const payWays = ({ card = true } = {}) =>
+export const payWays = ({ card = shop.payments.card.enabled } = {}) =>
   listOr(
     [
       card && `card (${cardGateway.name})`,
       shop.payments.bankTransfer.enabled && 'bank transfer',
       shop.payments.cod.enabled && 'cash on delivery',
+      shop.payments.payAtStore.enabled && 'pay at the store',
     ].filter((w): w is string => !!w),
   )

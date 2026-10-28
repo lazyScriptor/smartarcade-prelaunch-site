@@ -1,34 +1,64 @@
-import { load, save } from './storage'
+import { formatLKR, shop, waLink } from '../config/shop'
+import type { CartRow } from '../store/cart'
 import type { DeliveryMethod } from './totals'
 
-export type PaymentMethod = 'card' | 'bank' | 'cod' | 'store' | 'whatsapp'
-
-export interface PlacedOrder {
-  ref: string
-  createdAt: string
-  customer: { name: string; mobile: string; email: string; address: string; city: string; district: string; notes: string }
+export interface OrderRequest {
+  name: string
+  mobile: string
   delivery: DeliveryMethod
-  payment: PaymentMethod
-  items: { name: string; variant?: string; qty: number; price: number }[]
-  subtotal: number
-  deliveryFee: number
-  total: number
+  address: string
+  city: string
+  district: string
+  notes: string
 }
 
-const KEY = 'orders.v1'
+const shorten = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text)
 
-export const newOrderRef = () => {
-  const d = new Date()
-  const ymd = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
-  return `WEB-${ymd}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`
+// Builds the prefilled WhatsApp message for an order request. Nothing is sent or stored by the site;
+// Smart Arcade only receives it if the customer taps Send in WhatsApp.
+export function orderRequestMessage(rows: CartRow[], request: OrderRequest) {
+  const build = (nameMax: number) => {
+    const lines = rows.map((row, index) => {
+      const price = row.product.price === null
+        ? 'price to be confirmed'
+        : `${row.product.priceFrom ? 'from ' : ''}${formatLKR(row.product.price)} each = ${formatLKR(row.product.price * row.qty)}`
+      return `${index + 1}. ${row.qty} × ${shorten(row.product.name, nameMax)} (ref ${row.product.id}) – ${price}`
+    })
+    const priced = rows.filter(row => row.lineTotal !== null)
+    const subtotal = priced.reduce((total, row) => total + (row.lineTotal ?? 0), 0)
+    const unpriced = rows.length - priced.length
+    return [
+      `Hi ${shop.name}, I'd like to place this order request:`,
+      '',
+      ...lines,
+      '',
+      priced.length ? `Items total${unpriced ? ' (priced items only)' : ''}: ${formatLKR(subtotal)}` : 'Items total: to be confirmed',
+      request.delivery === 'pickup'
+        ? `Collection: store pickup (${shop.city})`
+        : `Delivery to: ${request.address}, ${request.city}, ${request.district}`,
+      '',
+      `Name: ${request.name}`,
+      `Mobile: ${request.mobile}`,
+      ...(request.notes ? [`Notes: ${request.notes}`] : []),
+      '',
+      'Please confirm availability, final prices, the delivery charge and how to pay.',
+    ].join('\n')
+  }
+  // wa.me links break on very long URLs, so shorten product names when the cart is large.
+  for (const nameMax of [70, 45, 30]) {
+    const text = build(nameMax)
+    if (encodeURIComponent(text).length <= 1800) return text
+  }
+  return build(30)
 }
 
-export const saveOrder = (o: PlacedOrder) => save(KEY, [o, ...load<PlacedOrder[]>(KEY, [])].slice(0, 20))
-export const findOrder = (ref: string) => load<PlacedOrder[]>(KEY, []).find(o => o.ref === ref)
+export const orderRequestLink = (rows: CartRow[], request: OrderRequest) => waLink(orderRequestMessage(rows, request))
 
-// Sri Lankan mobile: 07XXXXXXXX, 7XXXXXXXX, 947XXXXXXXX or +947XXXXXXXX → +947XXXXXXXX
+// Sri Lankan mobile or Colombo landline → E.164 (+94...).
 export function normaliseMobile(raw: string) {
   const digits = raw.replace(/[\s\-()]/g, '')
+  const colomboLandline = digits.match(/^(?:\+94|94|0)?(11\d{7})$/)
+  if (colomboLandline) return `+94${colomboLandline[1]}`
   const m = digits.match(/^(?:\+94|94|0)?(7\d{8})$/)
   return m ? `+94${m[1]}` : null
 }

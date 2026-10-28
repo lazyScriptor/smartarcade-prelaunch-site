@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
-import { CartProvider } from './store/cart'
 import { shop } from './config/shop'
+import { CartProvider } from './store/cart'
 import './index.css'
 
 const root = document.documentElement.style
