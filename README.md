@@ -35,4 +35,4 @@ The importer includes the primary-image columns, white-background image, and add
 
 ## Deploy (Cloudflare Pages)
 
-Build command `npm run build`, output directory `dist`. `public/_redirects` sends deep links to `index.html`.
+Build command `npm run build`, output directory `dist`. `wrangler.jsonc` serves `dist/` and sends deep links to `index.html` (single-page-application mode); there is no `_redirects` file because Workers rejects the catch-all rule.
