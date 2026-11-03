@@ -1,4 +1,5 @@
 import { darazCatalog } from './darazCatalog'
+import { darazCatalogExtra } from './darazCatalogExtra'
 import { approvedPrices, fromPriceIds } from './approvedPrices'
 
 export type CatalogCategoryId = 'gaming' | 'audio' | 'power' | 'computing' | 'wearables' | 'mobile' | 'other'
@@ -47,7 +48,7 @@ function categoryFor(name: string): CatalogCategoryId {
   return 'other'
 }
 
-export const catalogProducts: CatalogProduct[] = darazCatalog
+export const catalogProducts: CatalogProduct[] = [...darazCatalog, ...darazCatalogExtra]
   .filter(item => (item.nameEn || item.nameSi) && item.cardImage)
   .map(item => {
     const name = item.nameEn || item.nameSi

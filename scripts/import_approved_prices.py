@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SOURCE = ROOT / "Smart arcade general details" / "Smart Arcade Competitive Pricing.xlsx"
 CATALOG = Path(__file__).resolve().parents[1] / "src" / "data" / "darazCatalog.ts"
 SOURCES = Path(__file__).resolve().parent / "price_sources.json"
+CATALOG_EXTRA = Path(__file__).resolve().parents[1] / "src" / "data" / "darazCatalogExtra.ts"
 OUTPUT = Path(__file__).resolve().parents[1] / "src" / "data" / "approvedPrices.ts"
 MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -82,9 +83,13 @@ def read_rows(archive: zipfile.ZipFile, sheet_path: str, strings: list[str]) -> 
 
 
 def visible_catalog_ids() -> set[str]:
-    text = CATALOG.read_text(encoding="utf-8")
-    prefix = "export const darazCatalog: DarazCatalogRecord[] = "
-    records = json.loads(text.split(prefix, 1)[1])
+    records: list[dict] = []
+    for path, prefix in (
+        (CATALOG, "export const darazCatalog: DarazCatalogRecord[] = "),
+        (CATALOG_EXTRA, "export const darazCatalogExtra: DarazCatalogRecord[] = "),
+    ):
+        if path.is_file():
+            records += json.loads(path.read_text(encoding="utf-8").split(prefix, 1)[1])
     return {
         str(item["id"]).strip()
         for item in records
