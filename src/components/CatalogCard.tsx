@@ -34,7 +34,7 @@ export default function CatalogCard({ product, eager = false }: { product: Catal
   }
 
   return (
-    <div ref={tiltRef} onPointerMove={onMove} onPointerLeave={onLeave} className="hud-frame flex h-full flex-col rounded-2xl border border-line bg-navy transition-transform duration-200 ease-out">
+    <div ref={tiltRef} onPointerMove={onMove} onPointerLeave={onLeave} className="hud-frame flex h-full flex-col rounded-2xl border border-line bg-surface transition-transform duration-200 ease-out">
       <Link to={`/product/${product.id}`} className="group block overflow-hidden rounded-t-[15px] bg-white" aria-label={product.name}>
         <div className="aspect-square p-3 sm:p-5">
           <CatalogImage src={product.cardImage} alt="" eager={eager} className="h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-105" />
@@ -42,12 +42,12 @@ export default function CatalogCard({ product, eager = false }: { product: Catal
       </Link>
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <p className="hud truncate text-xs uppercase tracking-wider text-muted">{product.brand || categoryById(product.category)?.name}</p>
-        <Link to={`/product/${product.id}`} className="mt-1 line-clamp-2 min-h-[2.6em] text-sm font-medium leading-[1.3] text-white hover:text-lime sm:text-[15px]">{product.name}</Link>
+        <Link to={`/product/${product.id}`} className="mt-1 line-clamp-2 min-h-[2.6em] text-sm font-medium leading-[1.3] text-ink hover:text-accent sm:text-[15px]">{product.name}</Link>
         {product.warranty && (
-          <p className="mt-2 flex items-start gap-1 text-xs leading-snug text-muted"><ShieldCheck className="h-3.5 w-3.5 shrink-0 text-lime" /> <span className="line-clamp-1">{product.warranty}</span></p>
+          <p className="mt-2 flex items-start gap-1 text-xs leading-snug text-muted"><ShieldCheck className="h-3.5 w-3.5 shrink-0 text-accent" /> <span className="line-clamp-1">{product.warranty}</span></p>
         )}
         <div className="mt-auto flex flex-wrap items-end justify-between gap-x-1 gap-y-2 pt-3">
-          <p className={`price whitespace-nowrap leading-tight ${product.price === null ? 'text-[13px] text-muted' : 'text-[15px] text-lime sm:text-lg'}`}>{priceText(product)}</p>
+          <p className={`price whitespace-nowrap leading-tight ${product.price === null ? 'text-[13px] text-muted' : 'text-[15px] text-accent sm:text-lg'}`}>{priceText(product)}</p>
           <button
             type="button"
             onClick={() => { add(product.id); setAdded(true) }}

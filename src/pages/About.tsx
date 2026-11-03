@@ -20,8 +20,8 @@ export default function About() {
       <section className="container-x grid grid-cols-1 items-center gap-8 pt-8 md:grid-cols-[1.3fr_1fr] md:pt-12">
         <div>
           <p className="eyebrow">Who we are</p>
-          <h2 className="mt-1.5 text-[1.75rem] leading-tight text-white md:text-4xl">Gaming gear and everyday tech, from {shop.city}.</h2>
-          <div className="mt-4 space-y-3 text-base leading-relaxed text-[#d9daf0]">
+          <h2 className="mt-1.5 text-[1.75rem] leading-tight text-ink md:text-4xl">Gaming gear and everyday tech, from {shop.city}.</h2>
+          <div className="mt-4 space-y-3 text-base leading-relaxed text-body">
             <p>{shop.name} is a tech shop in {shop.city}, {shop.country}. We carry {catalogProducts.length} products from {topBrands.length} brands, including {topBrands.slice(0, 4).join(', ')} and more: headsets, speakers, power banks, smart watches, cables and the small things that make your setup work.</p>
             <p>Browse here, build a cart and send it to us on WhatsApp. We confirm what’s in stock, the final price and how you’d like to pay and receive it.</p>
           </div>
@@ -42,8 +42,8 @@ export default function About() {
             <Reveal key={title} index={index}>
               <div className="surface h-full p-5">
                 <span className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-lime text-navy"><Icon className="h-5 w-5" /></span>
-                <h3 className="mt-3 text-lg text-white">{title}</h3>
-                <p className="mt-1 text-[15px] leading-relaxed text-[#d9daf0]">{text}</p>
+                <h3 className="mt-3 text-lg text-ink">{title}</h3>
+                <p className="mt-1 text-[15px] leading-relaxed text-body">{text}</p>
               </div>
             </Reveal>
           ))}

@@ -7,14 +7,14 @@ import Logo from './Logo'
 import PaymentBadges from './PaymentBadges'
 
 export default function Footer() {
-  const columnTitle = 'hud mb-3 text-[13px] uppercase tracking-[0.16em] text-lime'
-  const linkClass = 'flex min-h-9 items-center text-[15px] text-[#d9daf0] hover:text-white'
+  const columnTitle = 'hud mb-3 text-[13px] uppercase tracking-[0.16em] text-accent'
+  const linkClass = 'flex min-h-9 items-center text-[15px] text-body hover:text-ink'
   return (
-    <footer className="page-bottom mt-16 border-t border-line bg-navy">
+    <footer className="page-bottom mt-16 border-t border-line bg-navy on-dark">
       <div className="container-x grid grid-cols-2 gap-x-6 gap-y-9 py-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] lg:py-14">
         <div className="col-span-2 lg:col-span-1">
           <Logo />
-          <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-[#d9daf0]">
+          <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-body">
             Gaming gear, audio, charging and smart tech from {shop.city}, {shop.country}.
           </p>
           <div className="mt-4"><PaymentBadges dark /></div>
@@ -33,12 +33,12 @@ export default function Footer() {
         </div>
         <div className="col-span-2 lg:col-span-1">
           <h2 className={columnTitle}>Reach us</h2>
-          <ul className="space-y-1 text-[15px] text-[#d9daf0]">
-            <li><a href={shop.mapsUrl} target="_blank" rel="noreferrer" className="flex min-h-9 items-center gap-2.5 hover:text-white"><MapPin className="h-4 w-4 shrink-0 text-lime" /> {shop.address}</a></li>
-            <li><a href={`tel:${shop.phoneHref}`} className="flex min-h-9 items-center gap-2.5 hover:text-white"><Phone className="h-4 w-4 shrink-0 text-lime" /> {shop.phone}</a></li>
-            <li><a href={`tel:${shop.phoneAltHref}`} className="flex min-h-9 items-center gap-2.5 hover:text-white"><Phone className="h-4 w-4 shrink-0 text-lime" /> {shop.phoneAlt}</a></li>
-            <li><a href={`mailto:${shop.email}`} className="flex min-h-9 items-center gap-2.5 break-all hover:text-white"><Mail className="h-4 w-4 shrink-0 text-lime" /> {shop.email}</a></li>
-            {shop.social.facebook && <li><a href={shop.social.facebook} target="_blank" rel="noreferrer" className="flex min-h-9 items-center gap-2.5 hover:text-white"><Facebook className="h-4 w-4 shrink-0 text-lime" /> Follow us on Facebook</a></li>}
+          <ul className="space-y-1 text-[15px] text-body">
+            <li><a href={shop.mapsUrl} target="_blank" rel="noreferrer" className="flex min-h-9 items-center gap-2.5 hover:text-ink"><MapPin className="h-4 w-4 shrink-0 text-accent" /> {shop.address}</a></li>
+            <li><a href={`tel:${shop.phoneHref}`} className="flex min-h-9 items-center gap-2.5 hover:text-ink"><Phone className="h-4 w-4 shrink-0 text-accent" /> {shop.phone}</a></li>
+            <li><a href={`tel:${shop.phoneAltHref}`} className="flex min-h-9 items-center gap-2.5 hover:text-ink"><Phone className="h-4 w-4 shrink-0 text-accent" /> {shop.phoneAlt}</a></li>
+            <li><a href={`mailto:${shop.email}`} className="flex min-h-9 items-center gap-2.5 break-all hover:text-ink"><Mail className="h-4 w-4 shrink-0 text-accent" /> {shop.email}</a></li>
+            {shop.social.facebook && <li><a href={shop.social.facebook} target="_blank" rel="noreferrer" className="flex min-h-9 items-center gap-2.5 hover:text-ink"><Facebook className="h-4 w-4 shrink-0 text-accent" /> Follow us on Facebook</a></li>}
           </ul>
         </div>
       </div>

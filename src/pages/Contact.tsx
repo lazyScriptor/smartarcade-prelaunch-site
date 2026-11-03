@@ -20,7 +20,7 @@ export default function Contact() {
   return (
     <>
       <PageHeader title="Contact & location" crumbs={[{ label: 'Contact' }]}>
-        <p className="mt-2 max-w-xl text-[15px] text-[#d9daf0] md:text-base">Questions about a product, an order or a warranty? Message us on WhatsApp or give us a call.</p>
+        <p className="mt-2 max-w-xl text-[15px] text-body md:text-base">Questions about a product, an order or a warranty? Message us on WhatsApp or give us a call.</p>
       </PageHeader>
       <section className="container-x pt-6">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -29,8 +29,8 @@ export default function Contact() {
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-lime text-navy"><Icon className="h-5 w-5" /></span>
               <span className="block min-w-0 lg:mt-3">
                 <span className="block text-[13px] text-muted">{title}</span>
-                <span className="block break-words font-semibold text-white">{value}</span>
-                {sub && <span className="block text-sm text-[#d9daf0]">{sub}</span>}
+                <span className="block break-words font-semibold text-ink">{value}</span>
+                {sub && <span className="block text-sm text-body">{sub}</span>}
               </span>
             </a>
           ))}
@@ -47,8 +47,8 @@ export default function Contact() {
             />
             <div className="flex flex-wrap items-center justify-between gap-3 p-4">
               <div>
-                <p className="font-semibold text-white">{shop.name}</p>
-                <p className="text-sm text-[#d9daf0]">{shop.address}</p>
+                <p className="font-semibold text-ink">{shop.name}</p>
+                <p className="text-sm text-body">{shop.address}</p>
               </div>
               <a href={shop.mapsUrl} target="_blank" rel="noreferrer" className="btn btn-lime"><Navigation className="h-5 w-5" /> Get directions</a>
             </div>
@@ -56,28 +56,28 @@ export default function Contact() {
           <div className="space-y-5">
             {shop.hoursConfirmed && (
               <div className="surface p-5">
-                <h2 className="flex items-center gap-2 text-lg text-white"><Clock className="h-5 w-5 text-lime" /> Opening hours</h2>
+                <h2 className="flex items-center gap-2 text-lg text-ink"><Clock className="h-5 w-5 text-accent" /> Opening hours</h2>
                 <dl className="mt-3 space-y-2 text-[15px]">
                   {shop.hours.map(hour => (
-                    <div key={hour.days} className="flex justify-between gap-4"><dt className="text-[#d9daf0]">{hour.days}</dt><dd className="font-semibold text-white">{hour.time}</dd></div>
+                    <div key={hour.days} className="flex justify-between gap-4"><dt className="text-body">{hour.days}</dt><dd className="font-semibold text-ink">{hour.time}</dd></div>
                   ))}
                 </dl>
               </div>
             )}
             <form onSubmit={send} className="surface p-4 md:p-5">
-              <h2 className="text-xl text-white">Send us a message</h2>
+              <h2 className="text-xl text-ink">Send us a message</h2>
               <p className="mt-1 text-sm text-muted">This opens WhatsApp with your message ready to send.</p>
               <div className="mt-3 space-y-3">
                 <div>
-                  <label htmlFor="c-name" className="mb-1.5 block text-[15px] font-medium text-[#e4e5f7]">Your name</label>
+                  <label htmlFor="c-name" className="mb-1.5 block text-[15px] font-medium text-body">Your name</label>
                   <input id="c-name" required autoComplete="name" className="input" value={form.name} onChange={event => setForm({ ...form, name: event.target.value })} />
                 </div>
                 <div>
-                  <label htmlFor="c-phone" className="mb-1.5 block text-[15px] font-medium text-[#e4e5f7]">Mobile number</label>
+                  <label htmlFor="c-phone" className="mb-1.5 block text-[15px] font-medium text-body">Mobile number</label>
                   <input id="c-phone" required type="tel" inputMode="tel" autoComplete="tel" className="input" value={form.phone} onChange={event => setForm({ ...form, phone: event.target.value })} />
                 </div>
                 <div>
-                  <label htmlFor="c-message" className="mb-1.5 block text-[15px] font-medium text-[#e4e5f7]">How can we help?</label>
+                  <label htmlFor="c-message" className="mb-1.5 block text-[15px] font-medium text-body">How can we help?</label>
                   <textarea id="c-message" required rows={4} className="input" value={form.message} onChange={event => setForm({ ...form, message: event.target.value })} />
                 </div>
               </div>

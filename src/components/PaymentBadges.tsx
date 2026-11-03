@@ -2,7 +2,7 @@ import { cardGateway, shop } from '../config/shop'
 
 // Neutral text badges. Swap for the card gateway's official payment-methods banner once the merchant account is approved.
 export default function PaymentBadges({ dark = false }: { dark?: boolean }) {
-  const base = dark ? 'border-white/15 bg-white/5 text-white/90' : 'border-slate-200 bg-white text-slate-700'
+  const base = dark ? 'border-white/15 bg-tint text-white/90' : 'border-slate-200 bg-white text-slate-700'
   const { card, bankTransfer, cod, payAtStore } = shop.payments
   const items = [
     card.enabled && 'VISA',

@@ -80,7 +80,7 @@ export default function SearchBox({ onDone, autoFocus = false, inline = false }:
           className="input pl-11 pr-11 [&::-webkit-search-cancel-button]:hidden"
         />
         {q && (
-          <button type="button" onClick={() => { setQ(''); inputRef.current?.focus() }} aria-label="Clear search" className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted hover:text-white">
+          <button type="button" onClick={() => { setQ(''); inputRef.current?.focus() }} aria-label="Clear search" className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted hover:text-ink">
             <X className="h-5 w-5" />
           </button>
         )}
@@ -88,19 +88,19 @@ export default function SearchBox({ onDone, autoFocus = false, inline = false }:
       {/* Keeps focus in the field while a result is pressed, so the list and on-screen keyboard stay put until the click lands. */}
       <div id={listId} onMouseDown={event => event.preventDefault()} className={showList ? (inline ? 'mt-3' : 'absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-line bg-navy shadow-2xl shadow-black/50') : 'hidden'}>
         {hits.map(product => (
-          <Link key={product.id} to={`/product/${product.id}`} onClick={finish} className="flex min-h-14 items-center gap-3 px-3 py-2 transition-colors hover:bg-white/10">
+          <Link key={product.id} to={`/product/${product.id}`} onClick={finish} className="flex min-h-14 items-center gap-3 px-3 py-2 transition-colors hover:bg-tint">
             <span className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white">
               <CatalogImage src={product.cardImage} alt="" sizes="48px" className="h-full w-full object-contain p-1" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[15px] font-medium text-white">{product.name}</span>
-              <span className="price text-sm text-lime">{priceLabel(product.price, product.priceFrom)}</span>
+              <span className="block truncate text-[15px] font-medium text-ink">{product.name}</span>
+              <span className="price text-sm text-accent">{priceLabel(product.price, product.priceFrom)}</span>
             </span>
           </Link>
         ))}
         {hits.length === 0 && <p className="px-4 py-4 text-[15px] text-muted">Nothing found for “{term}”. Try a brand or product type.</p>}
         {hits.length > 0 && (
-          <Link to={`/shop?q=${encodeURIComponent(term)}`} onClick={finish} className="hud flex min-h-12 items-center border-t border-line px-4 text-[15px] text-lime hover:bg-white/10">
+          <Link to={`/shop?q=${encodeURIComponent(term)}`} onClick={finish} className="hud flex min-h-12 items-center border-t border-line px-4 text-[15px] text-accent hover:bg-tint">
             See all results for “{term}”
           </Link>
         )}

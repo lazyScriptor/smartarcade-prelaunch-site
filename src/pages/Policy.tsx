@@ -15,7 +15,7 @@ export default function Policy() {
       <PageHeader title={doc.title} crumbs={[{ label: 'Policies' }, { label: doc.title }]}>
         <p className="mt-2 text-sm text-muted">Last updated: {shop.policyUpdated}</p>
       </PageHeader>
-      <nav className="sticky top-[61px] z-30 border-b border-line bg-[rgba(10,10,43,0.95)] backdrop-blur-md lg:top-[69px]" aria-label="Policies">
+      <nav className="sticky top-[61px] z-30 border-b border-line bg-[rgba(10,10,43,0.95)] backdrop-blur-md lg:top-[69px] on-dark" aria-label="Policies">
         <div className="container-x no-scrollbar flex gap-2 overflow-x-auto py-2">
           {policies.map(policy => (
             <Link key={policy.slug} to={`/policies/${policy.slug}`} aria-current={policy.slug === doc.slug ? 'page' : undefined} className="chip">{policy.title}</Link>

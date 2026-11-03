@@ -31,14 +31,14 @@ export default function Faq() {
         <div className="space-y-3">
           {faqs.map(([question, answer]) => (
             <details key={question} className="surface group">
-              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 p-4 font-semibold text-white">
-                {question}<ChevronDown className="h-5 w-5 shrink-0 text-lime transition-transform duration-200 group-open:rotate-180" />
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 p-4 font-semibold text-ink">
+                {question}<ChevronDown className="h-5 w-5 shrink-0 text-accent transition-transform duration-200 group-open:rotate-180" />
               </summary>
-              <p className="px-4 pb-4 text-[15px] leading-relaxed text-[#d9daf0]">{answer}</p>
+              <p className="px-4 pb-4 text-[15px] leading-relaxed text-body">{answer}</p>
             </details>
           ))}
         </div>
-        <p className="mt-7 text-center text-[15px] text-muted">Still have a question? <Link to="/contact" className="font-semibold text-lime underline">Contact us</Link>.</p>
+        <p className="mt-7 text-center text-[15px] text-muted">Still have a question? <Link to="/contact" className="font-semibold text-accent underline">Contact us</Link>.</p>
       </section>
     </>
   )

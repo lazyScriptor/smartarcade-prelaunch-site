@@ -75,10 +75,10 @@ export default function CatalogPage() {
   return (
     <>
       <PageHeader title={title} crumbs={[{ label: 'Shop', to: category ? '/shop' : undefined }, ...(category ? [{ label: category.name }] : [])]}>
-        {category && <p className="mt-2 max-w-2xl text-[15px] text-[#d9daf0] md:text-base">{category.blurb}</p>}
+        {category && <p className="mt-2 max-w-2xl text-[15px] text-body md:text-base">{category.blurb}</p>}
       </PageHeader>
 
-      <nav aria-label="Product types" className="sticky top-[61px] z-30 border-b border-line bg-[rgba(10,10,43,0.95)] backdrop-blur-md lg:top-[69px]">
+      <nav aria-label="Product types" className="sticky top-[61px] z-30 border-b border-line bg-[rgba(10,10,43,0.95)] backdrop-blur-md lg:top-[69px] on-dark">
         <div className="container-x no-scrollbar flex gap-2 overflow-x-auto py-2">
           <Link to={`/shop${keepQuery}`} aria-current={!category ? 'page' : undefined} className="chip">All</Link>
           {visibleCatalogCategories.map(item => (
@@ -112,10 +112,10 @@ export default function CatalogPage() {
         </div>
 
         <div ref={gridTop} className="mb-4 mt-4 flex flex-wrap items-center gap-2">
-          <p className="hud mr-auto text-[15px] text-white" aria-live="polite">{filtered.length} {filtered.length === 1 ? 'product' : 'products'}</p>
+          <p className="hud mr-auto text-[15px] text-ink" aria-live="polite">{filtered.length} {filtered.length === 1 ? 'product' : 'products'}</p>
           <button type="button" aria-pressed={pricedOnly} onClick={() => update('priced', pricedOnly ? '' : '1')} className="chip">With price only</button>
           {activeFilters.map(item => (
-            <button key={item.key} onClick={() => update(item.key, '')} aria-label={`Remove filter ${item.label}`} className="chip border-lime/60 text-lime">
+            <button key={item.key} onClick={() => update(item.key, '')} aria-label={`Remove filter ${item.label}`} className="chip border-lime/60 text-accent">
               {item.label} <X className="h-4 w-4" />
             </button>
           ))}
@@ -126,8 +126,8 @@ export default function CatalogPage() {
             {visible.map((product, index) => <CatalogCard key={product.id} product={product} eager={index < 4} />)}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-white/30 p-10 text-center">
-            <p className="font-display text-xl text-white">Nothing matches that</p>
+          <div className="rounded-2xl border border-dashed border-strong p-10 text-center">
+            <p className="font-display text-xl text-ink">Nothing matches that</p>
             <p className="mt-1 text-[15px] text-muted">Try fewer filters, or ask us on WhatsApp.</p>
             <button className="btn btn-lime mt-4" onClick={() => setParams({}, { replace: true })}>Clear all filters</button>
           </div>
@@ -136,7 +136,7 @@ export default function CatalogPage() {
         {filtered.length > pageSize && (
           <nav className="mt-7 flex items-center justify-between gap-3 md:justify-center" aria-label="Pages">
             <button className="btn btn-ghost" disabled={page <= 1} onClick={() => goToPage(page - 1)}><ChevronLeft className="h-5 w-5" /> Prev</button>
-            <span className="hud text-[15px] tabular-nums text-white">Page {page} of {totalPages}</span>
+            <span className="hud text-[15px] tabular-nums text-ink">Page {page} of {totalPages}</span>
             <button className="btn btn-ghost" disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>Next <ChevronRight className="h-5 w-5" /></button>
           </nav>
         )}

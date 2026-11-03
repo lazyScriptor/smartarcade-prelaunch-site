@@ -44,9 +44,9 @@ function Gallery({ product, images }: { product: CatalogProduct; images: string[
         </div>
         {images.length > 1 && (
           <>
-            <button onClick={() => go(active - 1)} aria-label="Previous photo" className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-navy/90 text-white hover:bg-navy sm:flex"><ChevronLeft className="h-5 w-5" /></button>
-            <button onClick={() => go(active + 1)} aria-label="Next photo" className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-navy/90 text-white hover:bg-navy sm:flex"><ChevronRight className="h-5 w-5" /></button>
-            <span className="hud absolute bottom-3 right-3 rounded-full bg-navy/90 px-3 py-1 text-[13px] tabular-nums text-white">{active + 1} / {images.length}</span>
+            <button onClick={() => go(active - 1)} aria-label="Previous photo" className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-navy/90 text-ink hover:bg-navy sm:flex on-dark"><ChevronLeft className="h-5 w-5" /></button>
+            <button onClick={() => go(active + 1)} aria-label="Next photo" className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-navy/90 text-ink hover:bg-navy sm:flex on-dark"><ChevronRight className="h-5 w-5" /></button>
+            <span className="hud absolute bottom-3 right-3 rounded-full bg-navy/90 px-3 py-1 text-[13px] tabular-nums text-ink on-dark">{active + 1} / {images.length}</span>
           </>
         )}
       </div>
@@ -107,12 +107,12 @@ function ProductView({ product }: { product: CatalogProduct }) {
 
         <div className="min-w-0">
           {product.brand && <p className="eyebrow">{product.brand}</p>}
-          <h2 className="mt-1 text-[1.5rem] leading-tight text-white md:text-[2rem]">{product.name}</h2>
+          <h2 className="mt-1 text-[1.5rem] leading-tight text-ink md:text-[2rem]">{product.name}</h2>
           {product.nameSi && <p className="mt-1 text-[15px] text-muted">{product.nameSi}</p>}
 
           <div className="surface mt-4 p-4">
-            <p className={`price ${product.price === null ? 'text-2xl text-white' : 'text-[2rem] leading-none text-lime'}`}>{priceText(product)}</p>
-            <p className="mt-2 text-sm leading-snug text-[#d9daf0]">
+            <p className={`price ${product.price === null ? 'text-2xl text-ink' : 'text-[2rem] leading-none text-accent'}`}>{priceText(product)}</p>
+            <p className="mt-2 text-sm leading-snug text-body">
               {product.price === null
                 ? 'Add it to your cart or ask us, and we’ll send you the price on WhatsApp.'
                 : product.priceFrom
@@ -128,15 +128,15 @@ function ProductView({ product }: { product: CatalogProduct }) {
             <a href={enquiry} target="_blank" rel="noreferrer" className="btn btn-wa mt-3 w-full"><MessageCircle className="h-5 w-5" /> Ask on WhatsApp</a>
           </div>
 
-          <ul className="mt-4 divide-y divide-line rounded-2xl border border-line text-[15px] text-[#e4e5f7]">
-            {product.warranty && <li className="flex items-center gap-3 p-3.5"><ShieldCheck className="h-5 w-5 shrink-0 text-lime" /> {product.warranty}</li>}
-            <li className="flex items-center gap-3 p-3.5"><Truck className="h-5 w-5 shrink-0 text-lime" /> <span>Island-wide delivery, from {formatLKR(shop.delivery.rates.baseFee)} by weight. <Link to="/policies/delivery" className="text-lime underline">Details</Link></span></li>
-            <li className="flex items-center gap-3 p-3.5"><Store className="h-5 w-5 shrink-0 text-lime" /> Free store pickup in {shop.city}</li>
+          <ul className="mt-4 divide-y divide-line rounded-2xl border border-line text-[15px] text-body">
+            {product.warranty && <li className="flex items-center gap-3 p-3.5"><ShieldCheck className="h-5 w-5 shrink-0 text-accent" /> {product.warranty}</li>}
+            <li className="flex items-center gap-3 p-3.5"><Truck className="h-5 w-5 shrink-0 text-accent" /> <span>Island-wide delivery, from {formatLKR(shop.delivery.rates.baseFee)} by weight. <Link to="/policies/delivery" className="text-accent underline">Details</Link></span></li>
+            <li className="flex items-center gap-3 p-3.5"><Store className="h-5 w-5 shrink-0 text-accent" /> Free store pickup in {shop.city}</li>
           </ul>
 
           {state === 'failed' && (
             <div className="mt-5 rounded-2xl border border-line p-4">
-              <p className="text-[15px] text-[#d9daf0]">We couldn’t load the full details for this product.</p>
+              <p className="text-[15px] text-body">We couldn’t load the full details for this product.</p>
               <button onClick={() => setAttempt(value => value + 1)} className="btn btn-ghost mt-3"><RotateCw className="h-4 w-4" /> Try again</button>
             </div>
           )}
@@ -144,8 +144,8 @@ function ProductView({ product }: { product: CatalogProduct }) {
 
           {details && details.highlights.length > 0 && (
             <section className="mt-6">
-              <h3 className="text-lg text-white">Highlights</h3>
-              <ul className="mt-2.5 space-y-2 text-[15px] leading-relaxed text-[#d9daf0]">
+              <h3 className="text-lg text-ink">Highlights</h3>
+              <ul className="mt-2.5 space-y-2 text-[15px] leading-relaxed text-body">
                 {details.highlights.slice(0, 8).map((highlight, index) => (
                   <li key={`${index}-${highlight}`} className="flex gap-2.5"><span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-[2px] bg-lime" />{highlight}</li>
                 ))}
@@ -154,14 +154,14 @@ function ProductView({ product }: { product: CatalogProduct }) {
           )}
           {details?.description && (
             <section className="mt-6">
-              <h3 className="text-lg text-white">Product details</h3>
-              <p className="mt-2.5 whitespace-pre-line break-words text-[15px] leading-relaxed text-[#d9daf0]">{details.description}</p>
+              <h3 className="text-lg text-ink">Product details</h3>
+              <p className="mt-2.5 whitespace-pre-line break-words text-[15px] leading-relaxed text-body">{details.description}</p>
             </section>
           )}
           {details?.warrantyPolicy && (
             <section className="mt-6 rounded-2xl border border-line p-4">
-              <h3 className="text-base text-white">Warranty details</h3>
-              <p className="mt-1.5 whitespace-pre-line break-words text-sm leading-relaxed text-[#d9daf0]">{details.warrantyPolicy}</p>
+              <h3 className="text-base text-ink">Warranty details</h3>
+              <p className="mt-1.5 whitespace-pre-line break-words text-sm leading-relaxed text-body">{details.warrantyPolicy}</p>
             </section>
           )}
         </div>
@@ -169,7 +169,7 @@ function ProductView({ product }: { product: CatalogProduct }) {
 
       {related.length > 0 && (
         <section className="container-x pt-12">
-          <h2 className="mb-4 text-[1.5rem] text-white md:text-3xl">More in {category?.name ?? 'the store'}</h2>
+          <h2 className="mb-4 text-[1.5rem] text-ink md:text-3xl">More in {category?.name ?? 'the store'}</h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
             {related.map(item => <CatalogCard key={item.id} product={item} />)}
           </div>
@@ -177,9 +177,9 @@ function ProductView({ product }: { product: CatalogProduct }) {
       )}
 
       {/* Keeps Add to cart in reach on small screens, above the tab bar. */}
-      <div className="fixed inset-x-0 bottom-[calc(var(--tabbar-h)+var(--safe-bottom))] z-20 border-t border-line bg-[rgba(17,17,65,0.97)] backdrop-blur-md lg:hidden">
+      <div className="fixed inset-x-0 bottom-[calc(var(--tabbar-h)+var(--safe-bottom))] z-20 border-t border-line bg-[rgba(17,17,65,0.97)] backdrop-blur-md lg:hidden on-dark">
         <div className="container-x flex items-center gap-3 py-2">
-          <p className={`price min-w-0 flex-1 truncate ${product.price === null ? 'text-sm text-muted' : 'text-lg text-lime'}`}>{priceText(product)}</p>
+          <p className={`price min-w-0 flex-1 truncate ${product.price === null ? 'text-sm text-muted' : 'text-lg text-accent'}`}>{priceText(product)}</p>
           <button onClick={addToCart} className={`btn shrink-0 ${added ? 'bg-emerald-500 text-[#04210f]' : 'btn-lime'}`} style={{ minHeight: 44 }}>
             {added ? <><Check className="h-5 w-5" /> Added</> : <><ShoppingBag className="h-5 w-5" /> Add to cart</>}
           </button>

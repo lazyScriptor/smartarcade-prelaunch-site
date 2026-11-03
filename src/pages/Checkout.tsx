@@ -24,9 +24,9 @@ export default function Checkout() {
         <PageHeader title="Request ready" crumbs={[{ label: 'Cart', to: '/cart' }, { label: 'Order request' }]} />
         <div className="container-x pt-8">
           <div className="surface mx-auto max-w-xl p-6 text-center md:p-8">
-            <CheckCircle2 className="mx-auto h-14 w-14 text-lime" />
-            <h2 className="mt-4 text-2xl text-white">Your request is ready in WhatsApp</h2>
-            <p className="mt-2 text-[15px] leading-relaxed text-[#d9daf0]">Tap <b className="text-white">Send</b> in WhatsApp to place the request. Nothing reaches us until you do. We will reply to confirm stock, final prices, delivery and how to pay.</p>
+            <CheckCircle2 className="mx-auto h-14 w-14 text-accent" />
+            <h2 className="mt-4 text-2xl text-ink">Your request is ready in WhatsApp</h2>
+            <p className="mt-2 text-[15px] leading-relaxed text-body">Tap <b className="text-ink">Send</b> in WhatsApp to place the request. Nothing reaches us until you do. We will reply to confirm stock, final prices, delivery and how to pay.</p>
             <a href={link} target="_blank" rel="noreferrer" className="btn btn-wa mt-6 w-full"><MessageCircle className="h-5 w-5" /> Open WhatsApp again</a>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <Link to="/cart" className="btn btn-ghost">Back to cart</Link>
@@ -74,7 +74,7 @@ export default function Checkout() {
   return (
     <>
       <PageHeader title="Order request" crumbs={[{ label: 'Cart', to: '/cart' }, { label: 'Order request' }]}>
-        <p className="mt-2 max-w-xl text-[15px] text-[#d9daf0]">Tell us where to send it. We’ll open WhatsApp with your request ready to go.</p>
+        <p className="mt-2 max-w-xl text-[15px] text-body">Tell us where to send it. We’ll open WhatsApp with your request ready to go.</p>
       </PageHeader>
       <form onSubmit={submit} noValidate className="container-x grid grid-cols-1 gap-5 pt-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
         <div className="space-y-6">
@@ -105,7 +105,7 @@ export default function Checkout() {
 
         <aside className="h-fit space-y-4 lg:sticky lg:top-24">
           <div className="surface p-5">
-            <h2 className="text-xl text-white">Your request</h2>
+            <h2 className="text-xl text-ink">Your request</h2>
             <ul className="mt-4 max-h-72 space-y-3 overflow-y-auto pr-1">
               {rows.map(r => (
                 <li key={r.key} className="flex gap-3">
@@ -113,21 +113,21 @@ export default function Checkout() {
                     <CatalogImage src={r.product.cardImage} alt="" className="h-full w-full object-contain p-1" />
                     <span className="absolute right-0.5 top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-lime px-1 text-[10px] font-bold text-navy">{r.qty}</span>
                   </span>
-                  <span className="min-w-0 flex-1 text-sm font-medium text-white"><span className="line-clamp-2">{r.product.name}</span></span>
-                  <span className="price text-right text-sm text-lime">{r.lineTotal === null ? 'We’ll confirm' : formatLKR(r.lineTotal)}</span>
+                  <span className="min-w-0 flex-1 text-sm font-medium text-ink"><span className="line-clamp-2">{r.product.name}</span></span>
+                  <span className="price text-right text-sm text-accent">{r.lineTotal === null ? 'We’ll confirm' : formatLKR(r.lineTotal)}</span>
                 </li>
               ))}
             </ul>
             <dl className="mt-4 space-y-2.5 border-t border-line pt-4 text-[15px]">
-              <div className="flex justify-between"><dt className="text-[#d9daf0]">Items{unpricedCount > 0 && ' with a price'}</dt><dd className="price text-white">{subtotal > 0 ? formatLKR(subtotal) : 'We’ll confirm'}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#d9daf0]">{delivery === 'pickup' ? 'Store pickup' : 'Delivery'}</dt><dd className="text-white">{delivery === 'pickup' ? 'Free' : 'We’ll confirm'}</dd></div>
+              <div className="flex justify-between"><dt className="text-body">Items{unpricedCount > 0 && ' with a price'}</dt><dd className="price text-ink">{subtotal > 0 ? formatLKR(subtotal) : 'We’ll confirm'}</dd></div>
+              <div className="flex justify-between"><dt className="text-body">{delivery === 'pickup' ? 'Store pickup' : 'Delivery'}</dt><dd className="text-ink">{delivery === 'pickup' ? 'Free' : 'We’ll confirm'}</dd></div>
             </dl>
             <p className="mt-3 text-sm leading-relaxed text-muted">This is a request, not a payment. We confirm final prices, stock and how to pay on WhatsApp.</p>
-            <label id="f-agree" className="mt-4 flex cursor-pointer gap-3 text-[15px] leading-snug text-[#d9daf0]">
+            <label id="f-agree" className="mt-4 flex cursor-pointer gap-3 text-[15px] leading-snug text-body">
               <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--brand-accent)]" checked={agree} onChange={e => { setAgree(e.target.checked); clearError('agree') }} />
-              <span>I agree to the <Link to="/policies/terms" className="font-semibold text-lime underline">Terms & Conditions</Link> and <Link to="/policies/refunds" className="font-semibold text-lime underline">Returns & Refunds Policy</Link>.</span>
+              <span>I agree to the <Link to="/policies/terms" className="font-semibold text-accent underline">Terms & Conditions</Link> and <Link to="/policies/refunds" className="font-semibold text-accent underline">Returns & Refunds Policy</Link>.</span>
             </label>
-            {errors.agree && <p role="alert" className="mt-2 text-sm text-rose-300">{errors.agree}</p>}
+            {errors.agree && <p role="alert" className="mt-2 text-sm text-rose-700">{errors.agree}</p>}
             <button type="submit" className="btn btn-wa mt-5 w-full text-base"><MessageCircle className="h-5 w-5" /> Send request on WhatsApp</button>
           </div>
         </aside>
@@ -139,7 +139,7 @@ export default function Checkout() {
 function Card({ step, title, children }: { step: number; title: string; children: ReactNode }) {
   return (
     <section className="surface p-4 md:p-6">
-      <h2 className="mb-4 flex items-center gap-3 text-xl text-white">
+      <h2 className="mb-4 flex items-center gap-3 text-xl text-ink">
         <span className="hud flex h-8 w-8 items-center justify-center rounded-lg bg-lime text-[15px] text-navy">{step}</span>{title}
       </h2>
       {children}
@@ -150,23 +150,23 @@ function Card({ step, title, children }: { step: number; title: string; children
 function Field({ id, label, error, wide, children }: { id: string; label: string; error?: string; wide?: boolean; children: ReactNode }) {
   return (
     <div className={wide ? 'sm:col-span-2' : ''}>
-      <label htmlFor={`f-${id}`} className="mb-1.5 block text-[15px] font-medium text-[#e4e5f7]">{label}</label>
+      <label htmlFor={`f-${id}`} className="mb-1.5 block text-[15px] font-medium text-body">{label}</label>
       {children}
-      {error && <p role="alert" className="mt-1.5 text-sm text-rose-300">{error}</p>}
+      {error && <p role="alert" className="mt-1.5 text-sm text-rose-700">{error}</p>}
     </div>
   )
 }
 
 function Choice({ checked, onChange, icon, title, text }: { checked: boolean; onChange: () => void; icon: ReactNode; title: string; text: string }) {
   return (
-    <label className={`flex cursor-pointer gap-3 rounded-2xl border-2 p-4 transition ${checked ? 'border-lime bg-lime/10' : 'border-white/25 hover:border-white/50'}`}>
+    <label className={`flex cursor-pointer gap-3 rounded-2xl border-2 p-4 transition ${checked ? 'border-lime bg-lime/10' : 'border-strong hover:border-ink'}`}>
       <input type="radio" name="delivery" aria-label={title} className="peer sr-only" checked={checked} onChange={onChange} />
-      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${checked ? 'bg-lime text-navy' : 'bg-white/10 text-white'}`}>{icon}</span>
+      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${checked ? 'bg-lime text-navy' : 'bg-tint text-ink'}`}>{icon}</span>
       <span className="min-w-0 flex-1">
-        <span className="block font-semibold text-white">{title}</span>
-        <span className="block text-sm text-[#d9daf0]">{text}</span>
+        <span className="block font-semibold text-ink">{title}</span>
+        <span className="block text-sm text-body">{text}</span>
       </span>
-      <span className={`mt-1 h-5 w-5 shrink-0 rounded-full border-2 ${checked ? 'border-[6px] border-lime' : 'border-white/40'}`} />
+      <span className={`mt-1 h-5 w-5 shrink-0 rounded-full border-2 ${checked ? 'border-[6px] border-lime' : 'border-strong'}`} />
     </label>
   )
 }
