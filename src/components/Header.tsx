@@ -20,7 +20,7 @@ const desktopNav = [
   { to: '/contact', label: 'Contact' },
 ]
 
-function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
+function Sheet({ open, onClose, title, children, fullScreen = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; fullScreen?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const dialog = ref.current
@@ -34,7 +34,7 @@ function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () 
       onClose={onClose}
       onClick={event => { if (event.target === ref.current) onClose() }}
       aria-label={title}
-      className="sheet m-0 mt-auto max-h-[88dvh] w-full max-w-none overflow-y-auto rounded-t-3xl border-t border-line bg-navy p-0 lg:hidden"
+      className={`sheet m-0 w-full max-w-none overflow-y-auto bg-navy p-0 lg:hidden ${fullScreen ? 'h-dvh max-h-none' : 'mt-auto max-h-[88dvh] rounded-t-3xl border-t border-line'}`}
     >
       <div className="sticky top-0 z-10 flex items-center justify-between bg-navy px-5 py-3">
         <h2 className="text-lg text-white">{title}</h2>
@@ -112,7 +112,7 @@ export default function Header() {
         </div>
       </nav>
 
-      <Sheet open={sheet === 'search'} onClose={() => setSheet(null)} title="Search">
+      <Sheet open={sheet === 'search'} onClose={() => setSheet(null)} title="Search" fullScreen>
         {sheet === 'search' && <SearchBox inline autoFocus onDone={() => setSheet(null)} />}
       </Sheet>
 
