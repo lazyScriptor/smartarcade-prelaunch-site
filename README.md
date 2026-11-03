@@ -1,7 +1,7 @@
 # Pre-launch static site (FR-CMS-12)
 
 Static product-catalogue preview for Smart Arcade. Prices are being set manually through a competitive review; stock is not shown in this preview.
-React + Vite + Tailwind; deploys to Cloudflare Pages.
+React + Vite + Tailwind; deploys to Cloudflare Workers (static assets).
 
 ## Run locally
 
@@ -38,6 +38,6 @@ The photo export has no selling price or stock quantity. A separate price export
 
 The importer includes the primary-image columns, white-background image, and additional `<img>` URLs found in each product description. It de-duplicates images per product and accepts only HTTPS images from `static-01.daraz.lk`.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers, builds on push to main)
 
 Build command `npm run build`, output directory `dist`. `wrangler.jsonc` serves `dist/` and sends deep links to `index.html` (single-page-application mode); there is no `_redirects` file because Workers rejects the catch-all rule.
