@@ -1,74 +1,92 @@
-import { Search } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { catalogProducts, catalogCategories } from '../data/catalog'
+import { Search, X } from 'lucide-react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { formatLKR } from '../config/shop'
+import { catalogProducts, matchesQuery } from '../data/catalog'
 import CatalogImage from './CatalogImage'
 
-export default function SearchBox({ onDone }: { onDone?: () => void }) {
+const priceLabel = (price: number | null, from: boolean) => (price === null ? 'Price on request' : `${from ? 'From ' : ''}${formatLKR(price)}`)
+
+export default function SearchBox({ onDone, autoFocus = false, inline = false }: { onDone?: () => void; autoFocus?: boolean; inline?: boolean }) {
   const [q, setQ] = useState('')
-  const [focus, setFocus] = useState(false)
+  const [open, setOpen] = useState(false)
   const navigate = useNavigate()
-  const blurTimer = useRef<number>(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const listId = useId()
+  const term = q.trim()
+
+  // Inside a modal dialog the browser focuses the first control when it opens, so focus the field just after.
+  useEffect(() => {
+    if (!autoFocus) return
+    const timer = window.setTimeout(() => inputRef.current?.focus(), 30)
+    return () => window.clearTimeout(timer)
+  }, [autoFocus])
 
   const hits = useMemo(() => {
-    const t = q.trim().toLowerCase()
-    if (t.length < 2) return []
-    return catalogProducts.filter(p => `${p.name} ${p.nameSi} ${p.category}`.toLowerCase().includes(t)).slice(0, 5)
-  }, [q])
+    if (term.length < 2) return []
+    const matches = catalogProducts.filter(product => matchesQuery(product, term))
+    return [...matches].sort((a, b) => Number(b.price !== null) - Number(a.price !== null)).slice(0, 6)
+  }, [term])
 
-  const go = (path: string) => {
+  const finish = () => {
     setQ('')
-    setFocus(false)
+    setOpen(false)
     onDone?.()
-    navigate(path)
   }
+  const showList = (inline || open) && term.length >= 2
 
   return (
     <form
       role="search"
       className="relative w-full"
-      onSubmit={e => {
-        e.preventDefault()
-        if (q.trim()) go(`/shop?q=${encodeURIComponent(q.trim())}`)
+      onSubmit={event => {
+        event.preventDefault()
+        if (!term) return
+        finish()
+        navigate(`/shop?q=${encodeURIComponent(term)}`)
+      }}
+      onBlur={event => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false)
       }}
     >
-      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
       <input
+        ref={inputRef}
         value={q}
-        onChange={e => setQ(e.target.value)}
-        onFocus={() => setFocus(true)}
-        onBlur={() => (blurTimer.current = window.setTimeout(() => setFocus(false), 150))}
-        placeholder="Search the product catalogue…"
+        onChange={event => { setQ(event.target.value); setOpen(true) }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={event => { if (event.key === 'Escape' && !inline) setOpen(false) }}
+        type="search"
+        enterKeyHint="search"
+        placeholder="Search JBL, power bank, smart watch…"
         aria-label="Search products"
-        className="w-full rounded-xl border border-white/10 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-lime"
+        aria-controls={listId}
+        className="input pl-11 pr-11 [&::-webkit-search-cancel-button]:hidden"
       />
-      {focus && hits.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
-          {hits.map(p => (
-            <button
-              type="button"
-              key={p.id}
-              onMouseDown={() => go(`/product/${p.id}`)}
-              className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-slate-50"
-            >
-              <span className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-slate-50">
-                <CatalogImage src={p.cardImage} alt="" className="h-full w-full object-contain p-1" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-slate-900">{p.name}</span>
-                <span className="text-xs capitalize text-slate-500">{catalogCategories.find(c => c.id === p.category)?.name}</span>
-              </span>
-            </button>
-          ))}
-          <button
-            type="button"
-            onMouseDown={() => go(`/shop?q=${encodeURIComponent(q.trim())}`)}
-            className="w-full border-t border-slate-100 px-3 py-2 text-left text-sm font-semibold text-navy hover:bg-slate-50"
-          >
-            See all results for “{q.trim()}”
-          </button>
-        </div>
+      {q && (
+        <button type="button" onClick={() => { setQ(''); inputRef.current?.focus() }} aria-label="Clear search" className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted hover:text-white">
+          <X className="h-5 w-5" />
+        </button>
       )}
+      <div id={listId} className={showList ? (inline ? 'mt-3' : 'absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-line bg-navy shadow-2xl shadow-black/50') : 'hidden'}>
+        {hits.map(product => (
+          <Link key={product.id} to={`/product/${product.id}`} onClick={finish} className="flex min-h-14 items-center gap-3 px-3 py-2 transition-colors hover:bg-white/10">
+            <span className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white">
+              <CatalogImage src={product.cardImage} alt="" sizes="48px" className="h-full w-full object-contain p-1" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[15px] font-medium text-white">{product.name}</span>
+              <span className="price text-sm text-lime">{priceLabel(product.price, product.priceFrom)}</span>
+            </span>
+          </Link>
+        ))}
+        {hits.length === 0 && <p className="px-4 py-4 text-[15px] text-muted">Nothing found for “{term}”. Try a brand or product type.</p>}
+        {hits.length > 0 && (
+          <Link to={`/shop?q=${encodeURIComponent(term)}`} onClick={finish} className="hud flex min-h-12 items-center border-t border-line px-4 text-[15px] text-lime hover:bg-white/10">
+            See all results for “{term}”
+          </Link>
+        )}
+      </div>
     </form>
   )
 }

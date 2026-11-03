@@ -4,20 +4,20 @@ import { Link } from 'react-router-dom'
 
 export default function PageHeader({ title, crumbs = [], children }: { title: string; crumbs?: { label: string; to?: string }[]; children?: ReactNode }) {
   return (
-    <section className="relative overflow-hidden bg-navy text-white">
+    <section className="relative overflow-hidden border-b border-line bg-navy">
       <div className="grid-bg absolute inset-0" />
-      <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-lime/20 blur-3xl" />
-      <div className="container-x relative py-10 md:py-14">
-        <nav className="mb-3 flex flex-wrap items-center gap-1 text-xs text-white/60" aria-label="Breadcrumb">
+      <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-lime/15 blur-3xl" />
+      <div className="container-x relative py-7 md:py-11">
+        <nav className="mb-2 flex flex-wrap items-center gap-1 text-[13px] text-muted" aria-label="Breadcrumb">
           <Link to="/" className="hover:text-white">Home</Link>
-          {crumbs.map(c => (
-            <span key={c.label} className="flex items-center gap-1">
-              <ChevronRight className="h-3 w-3" />
-              {c.to ? <Link to={c.to} className="hover:text-white">{c.label}</Link> : <span className="text-white/90">{c.label}</span>}
+          {crumbs.map(crumb => (
+            <span key={crumb.label} className="flex items-center gap-1">
+              <ChevronRight className="h-3.5 w-3.5" />
+              {crumb.to ? <Link to={crumb.to} className="hover:text-white">{crumb.label}</Link> : <span className="text-white">{crumb.label}</span>}
             </span>
           ))}
         </nav>
-        <h1 className="text-3xl font-extrabold md:text-4xl">{title}</h1>
+        <h1 className="text-[1.75rem] leading-tight text-white md:text-5xl">{title}</h1>
         {children}
       </div>
     </section>

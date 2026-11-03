@@ -29,7 +29,6 @@ export const policies: PolicyDoc[] = [
           <li>All prices are in Sri Lankan Rupees (LKR) and include any applicable taxes unless stated otherwise.</li>
           <li>We do our best to show accurate descriptions, photos and prices. If an item is listed at an incorrect price we will contact you before processing the order and you may cancel for a full refund.</li>
           <li>Product photos are for illustration; colours and packaging may vary slightly.</li>
-          <li>Pre-owned items are tested and graded by us; their condition is described on each product page.</li>
         </ul>
         <h2>2. Orders</h2>
         <ul>
@@ -69,7 +68,7 @@ export const policies: PolicyDoc[] = [
     summary: 'What personal data we collect and how we protect it.',
     body: () => (
       <>
-        <p>This page describes how the current Smart Arcade pre-launch site handles information. The policy wording should be reviewed and approved by the business before the site is used for live sales.</p>
+        <p>This page describes how the Smart Arcade website handles information.</p>
         <h2>Information and browser storage</h2>
         <ul>
           <li>This site takes no payments. The cart's “Send request on WhatsApp” form and the Contact form ask for your name and mobile number (and, for delivery, your address and notes) only to prepare a WhatsApp message. They are not sent to or saved by this site.</li>

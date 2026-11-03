@@ -1,144 +1,191 @@
-import { Check, ChevronLeft, ChevronRight, Images, ShieldCheck, ShoppingBag } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Check, ChevronLeft, ChevronRight, MessageCircle, RotateCw, ShieldCheck, ShoppingBag, Store, Truck } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import QtyStepper from '../components/QtyStepper'
-import { useCart } from '../store/cart'
-import CatalogCard from '../components/CatalogCard'
+import CatalogCard, { priceText } from '../components/CatalogCard'
 import CatalogImage from '../components/CatalogImage'
 import PageHeader from '../components/PageHeader'
+import QtyStepper from '../components/QtyStepper'
 import { formatLKR, shop, waLink } from '../config/shop'
-import { catalogCategories, catalogProductById, catalogProducts } from '../data/catalog'
+import { catalogProductById, catalogProducts, categoryById, loadProductDetails, type CatalogProduct, type ProductDetails } from '../data/catalog'
+import { prefersReducedMotion, usePageTitle } from '../hooks/ui'
+import { useCart } from '../store/cart'
 import NotFound from './NotFound'
 
 export default function CatalogProductPage() {
   const { id = '' } = useParams()
   const product = catalogProductById(id)
-  const [activeIndex, setActiveIndex] = useState(0)
+  if (!product) return <NotFound />
+  return <ProductView key={product.id} product={product} />
+}
+
+function Gallery({ product, images }: { product: CatalogProduct; images: string[] }) {
+  const rail = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState(0)
+  const go = (index: number) => {
+    const node = rail.current
+    if (!node) return
+    const next = (index + images.length) % images.length
+    node.scrollTo({ left: next * node.clientWidth, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
+    setActive(next)
+  }
+  const onScroll = () => {
+    const node = rail.current
+    if (node) setActive(Math.round(node.scrollLeft / node.clientWidth))
+  }
+  return (
+    <div className="min-w-0">
+      <div className="relative overflow-hidden rounded-2xl bg-white">
+        <div ref={rail} onScroll={onScroll} tabIndex={0} aria-label={`Photos of ${product.name}, ${images.length} in total`} className="snap-x-rail no-scrollbar flex aspect-square overflow-x-auto">
+          {images.map((image, index) => (
+            <div key={image} className="h-full w-full shrink-0 p-4 sm:p-8">
+              <CatalogImage src={image} alt={index === 0 ? product.name : `${product.name}, photo ${index + 1}`} eager={index === 0} full sizes="(min-width: 1024px) 50vw, 100vw" className="h-full w-full object-contain" />
+            </div>
+          ))}
+        </div>
+        {images.length > 1 && (
+          <>
+            <button onClick={() => go(active - 1)} aria-label="Previous photo" className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-navy/90 text-white hover:bg-navy sm:flex"><ChevronLeft className="h-5 w-5" /></button>
+            <button onClick={() => go(active + 1)} aria-label="Next photo" className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-navy/90 text-white hover:bg-navy sm:flex"><ChevronRight className="h-5 w-5" /></button>
+            <span className="hud absolute bottom-3 right-3 rounded-full bg-navy/90 px-3 py-1 text-[13px] tabular-nums text-white">{active + 1} / {images.length}</span>
+          </>
+        )}
+      </div>
+      {images.length > 1 && (
+        <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Choose a photo">
+          {images.map((image, index) => (
+            <button key={image} onClick={() => go(index)} aria-label={`Show photo ${index + 1}`} aria-pressed={index === active} className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 bg-white p-1 transition-[border-color,opacity] sm:h-20 sm:w-20 ${index === active ? 'border-lime' : 'border-transparent opacity-70 hover:opacity-100'}`}>
+              <CatalogImage src={image} alt="" sizes="80px" className="h-full w-full object-contain" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ProductView({ product }: { product: CatalogProduct }) {
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
+  const [details, setDetails] = useState<ProductDetails | null>(null)
+  const [state, setState] = useState<'loading' | 'ready' | 'failed'>('loading')
+  const [attempt, setAttempt] = useState(0)
   const { add } = useCart()
+  usePageTitle(product.name.slice(0, 60))
 
   useEffect(() => {
-    setActiveIndex(0)
-    setQty(1)
-    setAdded(false)
-  }, [id])
+    let current = true
+    setState('loading')
+    loadProductDetails(product.id)
+      .then(result => { if (current) { setDetails(result); setState('ready') } })
+      .catch(() => { if (current) setState('failed') })
+    return () => { current = false }
+  }, [product.id, attempt])
 
-  if (!product) return <NotFound />
+  useEffect(() => {
+    if (!added) return
+    const timer = window.setTimeout(() => setAdded(false), 1800)
+    return () => window.clearTimeout(timer)
+  }, [added])
 
-  const images = product.images.length ? product.images : [product.cardImage]
-  const active = Math.min(activeIndex, images.length - 1)
-  const category = catalogCategories.find(item => item.id === product.category)
-  const warranty = [product.warrantyPeriod, product.warrantyType].filter(Boolean).join(' · ')
-  const related = catalogProducts.filter(item => item.category === product.category && item.id !== product.id).slice(0, 4)
-  const inquiry = waLink(`Hi ${shop.name}, I’m interested in ${product.name} (product ${product.id}). Please confirm the current price and availability.`)
-
-  const move = (direction: -1 | 1) => setActiveIndex((active + direction + images.length) % images.length)
+  const category = categoryById(product.category)
+  const images = details?.images.length ? details.images : [product.cardImage]
+  const related = catalogProducts
+    .filter(item => item.category === product.category && item.id !== product.id)
+    .sort((a, b) => Number(b.price !== null) - Number(a.price !== null))
+    .slice(0, 4)
+  const enquiry = waLink(`Hi ${shop.name}, I’m interested in ${product.name} (ref ${product.id}). Please confirm the price and availability.`)
+  const addToCart = () => { add(product.id, qty); setAdded(true) }
 
   return (
     <>
-      <PageHeader title="Product details" crumbs={[{ label: 'Product catalogue', to: '/shop' }, ...(category ? [{ label: category.name, to: `/shop/${category.id}` }] : [])]}>
-        <p className="mt-3 text-sm text-white/60">Product reference: {product.id}</p>
-      </PageHeader>
+      <PageHeader title={category?.name ?? 'Product'} crumbs={[{ label: 'Shop', to: '/shop' }, ...(category ? [{ label: category.name, to: `/shop/${category.id}` }] : [])]} />
 
-      <section className="container-x grid gap-8 py-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,.9fr)] lg:gap-12">
-        <div className="min-w-0">
-          <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 shadow-sm">
-            <CatalogImage src={images[active]} alt={`${product.name}, photo ${active + 1}`} eager className="h-full w-full object-contain p-5 sm:p-10" />
-            {images.length > 1 && (
-              <>
-                <button className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/90 shadow-md transition hover:bg-white" onClick={() => move(-1)} aria-label="Previous photo">
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/90 shadow-md transition hover:bg-white" onClick={() => move(1)} aria-label="Next photo">
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-                <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-navy/85 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-                  {active + 1} / {images.length}
-                </span>
-              </>
-            )}
-          </div>
-
-          {images.length > 1 && (
-            <div className="no-scrollbar mt-4 flex gap-3 overflow-x-auto pb-2" aria-label="Product photos">
-              {images.map((image, index) => (
-                <button
-                  key={`${image}-${index}`}
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={`Show photo ${index + 1}`}
-                  aria-pressed={index === active}
-                  className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 bg-white p-1 transition sm:h-24 sm:w-24 ${index === active ? 'border-navy shadow-md' : 'border-slate-200 opacity-70 hover:opacity-100'}`}
-                >
-                  <CatalogImage src={image} alt="" className="h-full w-full rounded-xl object-contain" />
-                </button>
-              ))}
-            </div>
-          )}
-          <p className="mt-2 flex items-center gap-1.5 text-xs text-slate-400"><Images className="h-3.5 w-3.5" /> {images.length} product photos</p>
+      <section className="container-x grid grid-cols-1 gap-6 pt-5 md:pt-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)] lg:gap-10">
+        <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+          {state === 'loading' ? <div className="skeleton aspect-square rounded-2xl" role="status" aria-label="Loading photos" /> : <Gallery product={product} images={images} />}
         </div>
 
-        <div className="lg:pt-2">
-          <span className="rounded-full bg-lime/35 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-navy">{category?.name ?? 'Product'}</span>
-          <h1 className="mt-4 text-2xl font-extrabold leading-tight text-navy md:text-3xl">{product.name}</h1>
-          {product.nameSi && product.nameSi !== product.name && <p className="mt-2 text-lg text-slate-500">{product.nameSi}</p>}
+        <div className="min-w-0">
+          {product.brand && <p className="eyebrow">{product.brand}</p>}
+          <h2 className="mt-1 text-[1.5rem] leading-tight text-white md:text-[2rem]">{product.name}</h2>
+          {product.nameSi && <p className="mt-1 text-[15px] text-muted">{product.nameSi}</p>}
 
-          {warranty && (
-            <div className="mt-5 inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
-              <ShieldCheck className="h-4 w-4" /> {warranty}
-            </div>
-          )}
-
-          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950">
-            <p className="text-xs font-bold uppercase tracking-wide text-amber-800">Price</p>
-            <p className="mt-1 text-xl font-extrabold text-navy">{product.price === null ? 'Price to be confirmed' : `${product.priceFrom ? 'From ' : ''}${formatLKR(product.price)}`}</p>
-            {product.priceFrom && <p className="mt-1 text-xs text-amber-900">Price depends on the size or version. We confirm the exact price on WhatsApp.</p>}
-            <p className="mt-2">Stock availability is confirmed by Smart Arcade.</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <QtyStepper value={qty} onChange={n => setQty(Math.max(1, n))} />
-              <button className="btn btn-navy flex-1" onClick={() => { add(product.id, qty); setAdded(true) }}>
-                {added ? <><Check className="h-4 w-4" /> Added to cart</> : <><ShoppingBag className="h-4 w-4" /> Add to cart</>}
+          <div className="surface mt-4 p-4">
+            <p className={`price ${product.price === null ? 'text-2xl text-white' : 'text-[2rem] leading-none text-lime'}`}>{priceText(product)}</p>
+            <p className="mt-2 text-sm leading-snug text-[#d9daf0]">
+              {product.price === null
+                ? 'Add it to your cart or ask us, and we’ll send you the price on WhatsApp.'
+                : product.priceFrom
+                  ? 'The price depends on the size or version. We confirm stock and the exact price on WhatsApp.'
+                  : 'We confirm stock and the final price on WhatsApp before you pay.'}
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <QtyStepper value={qty} onChange={value => setQty(Math.max(1, value))} />
+              <button onClick={addToCart} className={`btn flex-1 whitespace-nowrap ${added ? 'bg-emerald-500 text-[#04210f]' : 'btn-lime'}`}>
+                {added ? <><Check className="h-5 w-5" /> Added</> : <><ShoppingBag className="h-5 w-5" /> Add to cart</>}
               </button>
             </div>
-            {added && <Link to="/cart" className="mt-3 block text-sm font-semibold text-navy underline">View cart and send your request</Link>}
-            <a href={inquiry} target="_blank" rel="noreferrer" className="btn btn-wa mt-3 w-full">Ask about this product on WhatsApp</a>
+            <a href={enquiry} target="_blank" rel="noreferrer" className="btn btn-wa mt-3 w-full"><MessageCircle className="h-5 w-5" /> Ask on WhatsApp</a>
           </div>
 
-          {product.description && (
-            <section className="mt-8">
-              <h2 className="text-lg font-bold text-navy">Product details</h2>
-              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600">{product.description}</p>
-            </section>
-          )}
+          <ul className="mt-4 divide-y divide-line rounded-2xl border border-line text-[15px] text-[#e4e5f7]">
+            {product.warranty && <li className="flex items-center gap-3 p-3.5"><ShieldCheck className="h-5 w-5 shrink-0 text-lime" /> {product.warranty}</li>}
+            <li className="flex items-center gap-3 p-3.5"><Truck className="h-5 w-5 shrink-0 text-lime" /> <span>Island-wide delivery, from {formatLKR(shop.delivery.rates.baseFee)} by weight. <Link to="/policies/delivery" className="text-lime underline">Details</Link></span></li>
+            <li className="flex items-center gap-3 p-3.5"><Store className="h-5 w-5 shrink-0 text-lime" /> Free store pickup in {shop.city}</li>
+          </ul>
 
-          {product.highlights.length > 0 && (
-            <section className="mt-7">
-              <h2 className="text-lg font-bold text-navy">Highlights</h2>
-              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-600">
-                {product.highlights.slice(0, 8).map((highlight, index) => <li key={`${index}-${highlight}`} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-lime-600" />{highlight}</li>)}
+          {state === 'failed' && (
+            <div className="mt-5 rounded-2xl border border-line p-4">
+              <p className="text-[15px] text-[#d9daf0]">We couldn’t load the full details for this product.</p>
+              <button onClick={() => setAttempt(value => value + 1)} className="btn btn-ghost mt-3"><RotateCw className="h-4 w-4" /> Try again</button>
+            </div>
+          )}
+          {state === 'loading' && <div className="mt-6 space-y-2" aria-hidden="true"><div className="skeleton h-4 w-full" /><div className="skeleton h-4 w-5/6" /><div className="skeleton h-4 w-2/3" /></div>}
+
+          {details && details.highlights.length > 0 && (
+            <section className="mt-6">
+              <h3 className="text-lg text-white">Highlights</h3>
+              <ul className="mt-2.5 space-y-2 text-[15px] leading-relaxed text-[#d9daf0]">
+                {details.highlights.slice(0, 8).map((highlight, index) => (
+                  <li key={`${index}-${highlight}`} className="flex gap-2.5"><span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-[2px] bg-lime" />{highlight}</li>
+                ))}
               </ul>
             </section>
           )}
-
-          {product.warrantyPolicy && (
-            <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-4">
-              <h2 className="text-sm font-bold text-navy">Warranty details from catalogue</h2>
-              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{product.warrantyPolicy}</p>
+          {details?.description && (
+            <section className="mt-6">
+              <h3 className="text-lg text-white">Product details</h3>
+              <p className="mt-2.5 whitespace-pre-line break-words text-[15px] leading-relaxed text-[#d9daf0]">{details.description}</p>
             </section>
           )}
-
-          <Link to="/shop" className="btn btn-navy mt-8">Back to all products</Link>
+          {details?.warrantyPolicy && (
+            <section className="mt-6 rounded-2xl border border-line p-4">
+              <h3 className="text-base text-white">Warranty details</h3>
+              <p className="mt-1.5 whitespace-pre-line break-words text-sm leading-relaxed text-[#d9daf0]">{details.warrantyPolicy}</p>
+            </section>
+          )}
         </div>
       </section>
 
       {related.length > 0 && (
-        <section className="container-x pb-12">
-          <h2 className="mb-5 text-2xl font-extrabold text-navy">More in {category?.name ?? 'the catalogue'}</h2>
-          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+        <section className="container-x pt-12">
+          <h2 className="mb-4 text-[1.5rem] text-white md:text-3xl">More in {category?.name ?? 'the store'}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
             {related.map(item => <CatalogCard key={item.id} product={item} />)}
           </div>
         </section>
       )}
+
+      {/* Keeps Add to cart in reach on small screens, above the tab bar. */}
+      <div className="fixed inset-x-0 bottom-[calc(var(--tabbar-h)+var(--safe-bottom))] z-20 border-t border-line bg-[rgba(17,17,65,0.97)] backdrop-blur-md lg:hidden">
+        <div className="container-x flex items-center gap-3 py-2">
+          <p className={`price min-w-0 flex-1 truncate ${product.price === null ? 'text-sm text-muted' : 'text-lg text-lime'}`}>{priceText(product)}</p>
+          <button onClick={addToCart} className={`btn shrink-0 ${added ? 'bg-emerald-500 text-[#04210f]' : 'btn-lime'}`} style={{ minHeight: 44 }}>
+            {added ? <><Check className="h-5 w-5" /> Added</> : <><ShoppingBag className="h-5 w-5" /> Add to cart</>}
+          </button>
+        </div>
+      </div>
+      <div className="h-16 lg:hidden" aria-hidden="true" />
     </>
   )
 }

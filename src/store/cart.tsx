@@ -10,6 +10,7 @@ interface CartState {
   count: number
   subtotal: number
   unpricedCount: number
+  lastAdded: { name: string; image: string; at: number } | null
   add: (id: string, qty?: number) => void
   setQty: (key: string, qty: number) => void
   remove: (key: string) => void
@@ -22,6 +23,7 @@ const maxQuantity = 10
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>(() => load<CartLine[]>(KEY, []))
+  const [lastAdded, setLastAdded] = useState<CartState['lastAdded']>(null)
 
   useEffect(() => {
     save(KEY, lines)
@@ -41,19 +43,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
       count: rows.reduce((total, row) => total + row.qty, 0),
       subtotal: rows.reduce((total, row) => total + (row.lineTotal ?? 0), 0),
       unpricedCount: rows.filter(row => row.lineTotal === null).reduce((total, row) => total + row.qty, 0),
-      add: (id, qty = 1) => setLines(previous => {
-        const key = id
-        const existing = previous.find(line => line.key === key)
-        if (existing) return previous.map(line => line.key === key ? { ...line, qty: Math.min(line.qty + qty, maxQuantity) } : line)
-        return [...previous, { key, id, qty: Math.max(1, Math.min(qty, maxQuantity)) }]
-      }),
+      lastAdded,
+      add: (id, qty = 1) => {
+        const product = catalogProductById(id)
+        if (product) setLastAdded({ name: product.name, image: product.cardImage, at: Date.now() })
+        setLines(previous => {
+          const key = id
+          const existing = previous.find(line => line.key === key)
+          if (existing) return previous.map(line => line.key === key ? { ...line, qty: Math.min(line.qty + qty, maxQuantity) } : line)
+          return [...previous, { key, id, qty: Math.max(1, Math.min(qty, maxQuantity)) }]
+        })
+      },
       setQty: (key, qty) => setLines(previous => qty <= 0
         ? previous.filter(line => line.key !== key)
         : previous.map(line => line.key === key ? { ...line, qty: Math.min(qty, maxQuantity) } : line)),
       remove: key => setLines(previous => previous.filter(line => line.key !== key)),
       clear: () => setLines([]),
     }
-  }, [lines])
+  }, [lines, lastAdded])
 
   return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>
 }

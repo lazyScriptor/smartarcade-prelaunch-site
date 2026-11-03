@@ -12,7 +12,7 @@ const cardGateways: Record<CardProvider, { name: string; maxPerPayment: number |
 
 export const shop = {
   name: 'Smart Arcade',
-  tagline: 'Level up your game.',
+  tagline: 'Level up your setup.',
   legalName: 'Smart Arcade', // TBC: exact registered business name for public display
   brNumber: '', // TBC for the payment-provider application; do not publish unless required
   city: 'Moratuwa',
@@ -26,6 +26,8 @@ export const shop = {
   phoneAltHref: '+94770034488',
   whatsapp: '94766642226',
   email: 'smartarcade.lk@gmail.com',
+  // Hours are placeholders until the client confirms them (OI-02); flip this to show them on the Contact page.
+  hoursConfirmed: false as boolean,
   hours: [
     { days: 'Monday – Saturday', time: '9.30 am – 8.00 pm' }, // TBC
     { days: 'Sunday & Poya days', time: '10.00 am – 6.00 pm' }, // TBC

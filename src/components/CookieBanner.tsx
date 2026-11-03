@@ -1,4 +1,3 @@
-import { Info } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { load, save } from '../lib/storage'
@@ -8,17 +7,12 @@ export default function CookieBanner() {
   if (dismissed) return null
   const dismiss = () => { save('privacy.notice.dismissed', true); setDismissed(true) }
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 p-4">
-      <div className="container-x">
-        <div className="fade-up flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl md:flex-row md:items-center">
-          <Info className="hidden h-8 w-8 shrink-0 text-navy md:block" />
-          <p className="flex-1 text-sm text-slate-600">
-            Product photos load from Daraz’s image host. WhatsApp links open with a prefilled message; WhatsApp/Meta processes it, and Smart Arcade receives it only if you tap Send. See our <Link to="/policies/privacy" className="font-semibold text-navy underline">Privacy Policy</Link>.
-          </p>
-          <div className="flex gap-2">
-            <button className="btn btn-navy py-2 text-sm" onClick={dismiss}>Got it</button>
-          </div>
-        </div>
+    <div role="region" aria-label="Privacy notice" className="fixed inset-x-0 bottom-[calc(var(--tabbar-h)+var(--safe-bottom))] z-30 p-3 lg:bottom-0 lg:left-auto lg:max-w-md lg:p-6 lg:pr-24">
+      <div className="toast-in flex items-center gap-3 rounded-2xl border border-line bg-navy-soft p-3.5 shadow-2xl shadow-black/50">
+        <p className="flex-1 text-[13px] leading-snug text-[#e4e5f7]">
+          We save your cart on this device. See our <Link to="/policies/privacy" className="font-semibold text-lime underline">Privacy Policy</Link>.
+        </p>
+        <button className="btn btn-lime shrink-0 px-4 text-[15px]" style={{ minHeight: 44 }} onClick={dismiss}>OK</button>
       </div>
     </div>
   )
